@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_store_marker"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#00FF0000"
+    android:clickable="true"
+    android:dividerPadding="0dp"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/marker_text"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="acgsbvascjk"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/marker_image"
+        android:layout_width="40dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center_horizontal"
+        android:adjustViewBounds="false"
+        android:cropToPadding="true"
+        android:paddingTop="16dp"
+        android:scaleType="fitCenter"
+        android:scaleX="1"
+        android:scaleY="1"
+        android:src="@drawable/pin"
+        app:srcCompat="@drawable/pin" />
+
+</LinearLayout>

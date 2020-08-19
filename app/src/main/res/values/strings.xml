@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">CIBIOD</string>
+    <!-- Strings related to login -->
+    <string name="promptCellID">Cell Tower ID</string>
+    <string name="promptUrbanRural">Urban/Rural</string>
+    <string name="promptAzimuthAngle">Azimuth Angle</string>
+    <string name="promptAddress">Address</string>
+    <string name="promptTowerType">Tower Type</string>
+    <string name="actionAddTower">Add Tower</string>
+    <string-array name="Gender">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="spinnerSharedNonShared">
+        <item>Shared</item>
+        <item>Non Shared</item>
+    </string-array>
+</resources>
