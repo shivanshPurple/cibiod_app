@@ -15,6 +15,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 
+import java.util.Objects;
+
 public class LogoScreen extends AppCompatActivity {
 //    private ImageView circle;
     private boolean isPressed;
@@ -22,7 +24,7 @@ public class LogoScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
-        getSupportActionBar().hide(); //hide the title bar
+        Objects.requireNonNull(getSupportActionBar()).hide(); //hide the title bar
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logo_screen);
@@ -74,7 +76,7 @@ public class LogoScreen extends AppCompatActivity {
 
     private void startApp()
     {
-        Intent intent = new Intent(this,patientEntry.class);
+        Intent intent = new Intent(this,bluetoothListActivity.class);
 
         Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this,android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
         startActivity(intent, bundle);
