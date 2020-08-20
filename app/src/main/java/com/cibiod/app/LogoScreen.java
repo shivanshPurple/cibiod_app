@@ -17,6 +17,9 @@ import android.widget.ImageButton;
 
 import java.util.Objects;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 public class LogoScreen extends AppCompatActivity {
 //    private ImageView circle;
     private boolean isPressed;
@@ -32,6 +35,8 @@ public class LogoScreen extends AppCompatActivity {
         ImageButton logo = findViewById(R.id.logo);
 
         final Animation fadeIn = AnimationUtils.loadAnimation(this,R.anim.fadein);
+
+        requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE}, 1);
 
         logo.startAnimation(fadeIn);
 //        circle.startAnimation(fadeIn2);
