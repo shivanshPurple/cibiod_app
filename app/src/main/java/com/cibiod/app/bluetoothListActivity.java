@@ -7,24 +7,25 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
+import android.media.audiofx.Equalizer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Window;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 import androidx.annotation.Nullable;
@@ -38,8 +39,9 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
     private ArrayList<btDevice> btDevices = new ArrayList<btDevice>();
     private BluetoothSocket btSocket;
     private SharedPreferences prefs;
-    private static final UUID uuid = UUID.fromString("00001102-0000-1000-8000-00805F9B34FB");
-    private MediaPlayer player = new MediaPlayer();
+    private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private AudioTrack at;
+    private boolean audioLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +52,20 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         setContentView(R.layout.activity_bluetooth_list);
 
         rv = findViewById(R.id.btListView);
+        int minBufferSize = AudioTrack.getMinBufferSize(44100,
+                AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
+        minBufferSize *= 2;
+
+        at = new AudioTrack(AudioManager.USE_DEFAULT_STREAM_TYPE, 44100,
+            AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,
+            minBufferSize, AudioTrack.MODE_STREAM);
+
+        attachEq(at.getAudioSessionId());
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
-            show("Bluetooth Required");
+            print("Bluetooth Required");
             finish();
         }
 
@@ -67,76 +79,105 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         {
             prefs = getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
 //            searchDevices();
-            try {
-                openServer();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-//            searchBondedDevices();
+            //                openServer();
+            File file = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.wav");
+            at.play();
+            playAudio(file);
+            //            searchBondedDevices();
         }
 
     }
 
-    private void openServer() throws IOException {
-        show("starting server");
+    private void attachEq(int audioSessionId) {
+        Equalizer eq = new Equalizer(100,audioSessionId);
+        short[] freqRange = eq.getBandLevelRange();
+        short minLvl = freqRange[0];
+        short maxLvl = freqRange[1];
+
+        eq.setBandLevel((short) 4,minLvl);
+        eq.setBandLevel((short) 3,minLvl);
+
+        eq.setEnabled(true);
+    }
+
+    private void openServer() {
+        print("starting server");
         BluetoothServerSocket tmp = null;
 
         try {
             tmp = bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord("CIBIOD app", uuid);
-            show("Listening to device");
+            print("Listening to device");
         } catch (IOException e) {
-            show("Socket's listen() method failed " + e);
+            print("Socket's listen() method failed " + e);
         }
-        BluetoothServerSocket btServerSocket = tmp;
 
-        BluetoothSocket socket;
+        final BluetoothServerSocket finalTmp = tmp;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BluetoothServerSocket btServerSocket = finalTmp;
 
-        while (true) {
-            try {
-                assert btServerSocket != null;
-                socket = btServerSocket.accept();
-                show("found socket");
-            } catch (IOException e) {
-                show("Socket's accept() method failed " + e);
-                break;
+                BluetoothSocket socket;
+
+                while (true) {
+                    try {
+                        assert btServerSocket != null;
+                        socket = btServerSocket.accept();
+                        Log.d("customm","found socket");
+                    } catch (IOException e) {
+                        Log.d("customm","Socket's accept() method failed " + e);
+                        break;
+                    }
+
+                    if (socket != null) {
+                        doInAndOut(socket);
+                        try {
+                            btServerSocket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    }
+                }
             }
-
-            if (socket != null) {
-                doInAndOut(socket);
-                btServerSocket.close();
-                break;
-            }
-        }
+        }).start();
     }
 
-    private void doInAndOut(BluetoothSocket socket) {
-        show("data exchange");
-        InputStream inStream = null;
-        try{
-            inStream = socket.getInputStream();
-        } catch (IOException e) {
-            show("input stream creation failed");
-        }
+    private void doInAndOut(final BluetoothSocket socket) {
+        Log.d("customm","data exchange");
 
-        byte[] inData = new byte[1024];
-        File file = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.mp3");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                InputStream inStream = null;
+                try{
+                    inStream = socket.getInputStream();
+                } catch (IOException e) {
+                    print("input stream creation failed");
+                }
 
-        try (OutputStream output = new FileOutputStream(file)) {
-            int read;
+                byte[] inData = new byte[1024];
+                File file = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.wav");
 
-            assert inStream != null;
-            while ((read = inStream.read(inData)) != -1) {
-                output.write(inData, 0, read);
-                show(String.valueOf(file.length()/(1024)));
-                if(file.length()/1024 > 50)
-                    playAudio(file, read);
+                try (OutputStream output = new FileOutputStream(file)) {
+                    int read;
+                    at.play();
+                    assert inStream != null;
+                    while ((read = inStream.read(inData)) != -1) {
+                        output.write(inData, 0, read);
+                        if(file.length()/1024>500 && !audioLoaded)
+                            playAudio(file);
+                        Log.d("customm",String.valueOf(file.length()/1024));
+                    }
+                    Log.d("customm","yeet");
+                    at.stop();
+                    at.release();
+                    output.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-
-            output.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        show("done");
+        }).start();
 
 //        OutputStream outStream = null;
 //        try {
@@ -155,24 +196,40 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 //        }
     }
 
-    private void playAudio(File file, final int read) throws IOException {
-        if(!player.isPlaying())
-        {
-            final FileInputStream fis = new FileInputStream(file);
-            player.prepareAsync();
-            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
+    private InputStream inStreamAudio = null;
+    private byte[] inDataAudio = new byte[1024];
+
+    private void playAudio(final File file) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true)
+                {
+                    int readAudio;
+                    if(!audioLoaded)
+                    {
+                        audioLoaded = true;
+                        try {
+                            inStreamAudio = new FileInputStream(file);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     try {
-                        player.setDataSource(fis.getFD(),0,read);
+                        if((readAudio = inStreamAudio.read(inDataAudio)) != -1)
+                        {
+                            at.write(inDataAudio,0, readAudio);
+                        }
+                        else
+                            break;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    mp.start();
-                }
-            });
 
-        }
+                }
+            }
+        }).start();
     }
 
 //    private void searchBondedDevices()
@@ -224,10 +281,16 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         unregisterReceiver(receiver);
     }
 
-    private void show(String s)
+    private void print(String s)
     {
-        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
         Log.d("customm",s);
+    }
+
+    private void print(int i)
+    {
+//        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+        Log.d("customm",String.valueOf(i));
     }
 
     @Override
@@ -244,16 +307,16 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 
         try {
             btSocket = toConnectBtDevice.createRfcommSocketToServiceRecord(uuid);
-            show("socket successful");
+            print("socket successful");
         } catch (IOException e) {
-            show("socket create failed: " + e.getMessage() + ".");
+            print("socket create failed: " + e.getMessage() + ".");
         }
 
         try {
             btSocket.connect();
-            show("connection successful");
+            print("connection successful");
         } catch (IOException connectException) {
-            show("connection failed");
+            print("connection failed");
             try {
                 btSocket.close();
             } catch (IOException closeException) {
@@ -272,17 +335,13 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         {
             if(resultCode==RESULT_CANCELED)
             {
-                show("Bluetooth Required");
+                print("Bluetooth Required");
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, 11);
             }
             else if(resultCode==RESULT_OK) {
 //                searchDevices();
-                try {
-                    openServer();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                openServer();
             }
         }
     }

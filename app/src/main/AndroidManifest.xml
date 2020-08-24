@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".bluetoothListActivity"></activity>
+        <activity android:name=".LogoScreen"/>
         <activity
             android:name=".patientEntry"
             android:noHistory="true" />
@@ -24,7 +24,7 @@
             android:name=".nearestTowers"
             android:noHistory="true" />
         <activity
-            android:name=".LogoScreen"
+            android:name=".bluetoothListActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
