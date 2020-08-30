@@ -132,8 +132,7 @@ public class patientEntry extends AppCompatActivity {
                     ArrayList<patientDetails> filter = new ArrayList<patientDetails>();
                     for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
 
-                        patientDetails temp = new patientDetails(
-                                postSnapshot.child("name").getValue().toString(),
+                        patientDetails temp = new patientDetails(postSnapshot.child("name").getValue().toString(),
                         postSnapshot.getKey(),
                         postSnapshot.child("address").getValue().toString(),
                         postSnapshot.child("gender").getValue().toString(),

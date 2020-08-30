@@ -13,6 +13,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.audiofx.Equalizer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -22,9 +23,11 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
@@ -33,6 +36,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.filters.BandPass;
+import be.tarsos.dsp.io.TarsosDSPAudioFormat;
+import be.tarsos.dsp.io.android.AndroidFFMPEGLocator;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.writer.WriterProcessor;
 
 public class bluetoothListActivity extends AppCompatActivity implements recyclerClickInterface{
     private BluetoothAdapter bluetoothAdapter;
@@ -45,6 +54,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
     private boolean audioLoaded = false;
     private TextView connectionText, batteryText;
     private Button whoButton, getPcgButton, lungButton, heartButton, allModeButton, goodbyeButton;
+    private Thread receiveDataThread;
 
 
     @Override
@@ -67,16 +77,14 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 
         initializeUiAndListener();
 
-        int minBufferSize = AudioTrack.getMinBufferSize(44100,
-                AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        int minBufferSize = AudioTrack.getMinBufferSize(32000,
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-        minBufferSize *= 2;
+//        minBufferSize *= 2;
 
-        at = new AudioTrack(AudioManager.USE_DEFAULT_STREAM_TYPE, 44100,
-                AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,
+        at = new AudioTrack(AudioManager.USE_DEFAULT_STREAM_TYPE, 32000,
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
                 minBufferSize, AudioTrack.MODE_STREAM);
-
-        attachEq(at.getAudioSessionId());
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -92,10 +100,13 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 
         else
         {
+            requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 14);
             prefs = getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
 //            searchDevices();
-            openServer();
-//            playAudio(file);
+//            openServer();
+            File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.wav");
+            playAudio(f);
+            eq2(f);
             //            searchBondedDevices();
         }
 
@@ -116,16 +127,43 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 sendData(connectedSocket,"who");
             }
         });
+
+        getPcgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendData(connectedSocket,"getPcg");
+            }
+        });
     }
 
-    private void attachEq(int audioSessionId) {
-        Equalizer eq = new Equalizer(100,audioSessionId);
+    private void attachEq(String mode) {
+        Equalizer eq = new Equalizer(100,at.getAudioSessionId());
         short[] freqRange = eq.getBandLevelRange();
         short minLvl = freqRange[0];
 
-        eq.setBandLevel((short) 4,minLvl);
-        eq.setBandLevel((short) 3,minLvl);
+        switch(mode)
+        {
+            case "lung":
+                eq.setBandLevel((short) 2,minLvl);
+                eq.setBandLevel((short) 3,minLvl);
+                eq.setBandLevel((short) 4,minLvl);
+                break;
 
+            case "heart":
+                eq.setBandLevel((short) 0,minLvl);
+                eq.setBandLevel((short) 1,minLvl);
+                eq.setBandLevel((short) 2,minLvl);
+                eq.setBandLevel((short) 3,minLvl);
+                eq.setBandLevel((short) 4,minLvl);
+                break;
+
+            default:
+                eq.setBandLevel((short) 0,(short)0);
+                eq.setBandLevel((short) 1,(short)0);
+                eq.setBandLevel((short) 2,(short)0);
+                eq.setBandLevel((short) 3,(short)0);
+                eq.setBandLevel((short) 4,(short)0);
+        }
         eq.setEnabled(true);
     }
 
@@ -171,8 +209,9 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         }).start();
     }
 
+    private boolean temp = true;
     private void receiveData(final BluetoothSocket socket) {
-        new Thread(new Runnable() {
+        receiveDataThread = new Thread() {
             @Override
             public void run() {
                 InputStream inStream = null;
@@ -183,42 +222,48 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 }
 
                 byte[] inData = new byte[1024];
-                while(true)
+                while(!this.isInterrupted())
                 {
                     try {
                         assert inStream != null;
-                        int l = inStream.read(inData);
-                        print(l + " length of things recived maybe");
-                        final String data = convertByteToString(inData);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                decodeDcip(data);
+
+                        if(temp)
+                        {
+                            inStream.read(inData);
+                            final String data = convertByteToString(inData);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    decodeDcip(data);
+                                }
+                            });
+                        }
+
+                        else
+                        {
+                            File file = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio2.wav");
+
+                            try (OutputStream output = new FileOutputStream(file)) {
+                                int read;
+                                while ((read = inStream.read(inData)) != -1) {
+                                    output.write(inData, 0, read);
+                                    if(file.length()/1024>300 && !audioLoaded)
+                                        playAudio(file);
+                                }
+                                temp = true;
+                                output.flush();
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-                        });
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-
-//                File file = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.wav");
-//
-//                try (OutputStream output = new FileOutputStream(file)) {
-//                    int read;
-//                    assert inStream != null;
-//                    while ((read = inStream.read(inData)) != -1) {
-//                        output.write(inData, 0, read);
-//                        if(file.length()/1024>500 && !audioLoaded)
-//                            playAudio(file);
-//                    }
-//                    at.stop();
-//                    at.release();
-//                    output.flush();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
             }
-        }).start();
+        };
+
+        receiveDataThread.start();
     }
 
     private void decodeDcip(String data) {
@@ -234,10 +279,16 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
             btDevices.add(new btDevice("Version",String.valueOf(getDataFromHex(data,6))));
             createList();
         }
+
+        else if(data.contains("02C10201"))
+        {
+            print("pcg incoming");
+            temp = false;
+        }
     }
 
     private int getDataFromHex(String str, int i) {
-        String sliced = str.substring(i,2);
+        String sliced = str.substring(i,i+2);
         return Integer.parseInt(sliced,16);
     }
 
@@ -263,7 +314,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
     }
 
     private void sendData(BluetoothSocket socket, String s) {
-        print("trying to send data");
         OutputStream outStream = null;
         try {
             outStream = socket.getOutputStream();
@@ -281,6 +331,15 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 message = hexStringToByte("0281017C");
                 break;
 
+            case "getPcg":
+                message = hexStringToByte("02820201");
+                break;
+
+            case "bye":
+                message = hexStringToByte("02BF013E");
+                receiveDataThread.interrupt();
+                break;
+
             default:
                 message = hexStringToByte("FF");
         }
@@ -288,7 +347,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         try {
             assert outStream != null;
             outStream.write(message);
-            print("data is sent");
+            print(s + " is sent");
         } catch (IOException e) {
             print("output stream disconnected");
         }
@@ -321,6 +380,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                     if(!audioLoaded)
                     {
                         audioLoaded = true;
+                        updateUiPcg();
                         try {
                             inStreamAudio = new FileInputStream(file);
                             at.play();
@@ -334,7 +394,11 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                             at.write(inDataAudio,0, readAudio);
                         }
                         else
+                        {
+                            at.stop();
+                            at.release();
                             break;
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -342,6 +406,63 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 }
             }
         }).start();
+    }
+
+    private boolean ifEqDone = false;
+
+    private void eq2(File file) {
+        new AndroidFFMPEGLocator(this);
+        final AudioDispatcher adp = AudioDispatcherFactory.fromPipe(file.getAbsolutePath(), 32000, 1024, 0);
+        final TarsosDSPAudioFormat format = adp.getFormat();
+
+        adp.addAudioProcessor(new BandPass(1000,100,32000));
+        RandomAccessFile raf = null;
+        try {
+            raf = new RandomAccessFile(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audioFiltered.wav", "rw");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        adp.addAudioProcessor(new WriterProcessor(format,raf));
+        adp.run();
+        print("running filter");
+
+        Thread audioThread = new Thread(adp, "Audio Thread");
+        audioThread.start();
+
+    }
+
+    private void updateUiPcg() {
+        lungButton.setAlpha(1);
+        heartButton.setAlpha(1);
+        allModeButton.setAlpha(1);
+        goodbyeButton.setAlpha(1);
+        lungButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attachEq("lung");
+            }
+        });
+
+        heartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attachEq("heart");
+            }
+        });
+
+        allModeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attachEq("all");
+            }
+        });
+
+        goodbyeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendData(connectedSocket,"bye");
+            }
+        });
     }
 
 //    private void searchBondedDevices()
