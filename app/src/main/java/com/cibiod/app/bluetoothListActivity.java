@@ -20,6 +20,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -37,10 +39,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.GainProcessor;
 import be.tarsos.dsp.filters.BandPass;
+import be.tarsos.dsp.filters.LowPassFS;
+import be.tarsos.dsp.filters.LowPassSP;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
+import be.tarsos.dsp.io.UniversalAudioInputStream;
+import be.tarsos.dsp.io.android.AndroidAudioPlayer;
 import be.tarsos.dsp.io.android.AndroidFFMPEGLocator;
-import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.resample.RateTransposer;
 import be.tarsos.dsp.writer.WriterProcessor;
 
 public class bluetoothListActivity extends AppCompatActivity implements recyclerClickInterface{
@@ -55,6 +62,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
     private TextView connectionText, batteryText;
     private Button whoButton, getPcgButton, lungButton, heartButton, allModeButton, goodbyeButton;
     private Thread receiveDataThread;
+    private int sampleRate = 22050;
 
 
     @Override
@@ -77,14 +85,13 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 
         initializeUiAndListener();
 
-        int minBufferSize = AudioTrack.getMinBufferSize(32000,
+        int minBufferSize = AudioTrack.getMinBufferSize(sampleRate,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-//        minBufferSize *= 2;
-
-        at = new AudioTrack(AudioManager.USE_DEFAULT_STREAM_TYPE, 32000,
-                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-                minBufferSize, AudioTrack.MODE_STREAM);
+        minBufferSize *= 2;
+//        at = new AudioTrack(AudioManager.USE_DEFAULT_STREAM_TYPE, sampleRate,
+//                AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,
+//                minBufferSize, AudioTrack.MODE_STREAM);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -102,15 +109,20 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         {
             requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 14);
             prefs = getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
+            openServer();
 //            searchDevices();
-//            openServer();
-            File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.wav");
-            playAudio(f);
-            eq2(f);
+//            File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.wav");
+//            playAudio(f);
+//            try {
+//                eq2(f, 1024);
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
             //            searchBondedDevices();
         }
 
     }
+    private FileOutputStream fos;
 
     private void initializeUiAndListener() {
         batteryText.setAlpha(0);
@@ -209,6 +221,8 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         }).start();
     }
 
+    int len = 0;
+
     private boolean temp = true;
     private void receiveData(final BluetoothSocket socket) {
         receiveDataThread = new Thread() {
@@ -222,40 +236,24 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 }
 
                 byte[] inData = new byte[1024];
+                int read;
                 while(!this.isInterrupted())
                 {
                     try {
                         assert inStream != null;
-
-                        if(temp)
-                        {
-                            inStream.read(inData);
-                            final String data = convertByteToString(inData);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    decodeDcip(data);
+                        read = inStream.read(inData);
+                        final String data = convertByteToString(inData);
+                        final int finalRead = read;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    decodeDcip(data, finalRead);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
                                 }
-                            });
-                        }
-
-                        else
-                        {
-                            File file = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio2.wav");
-
-                            try (OutputStream output = new FileOutputStream(file)) {
-                                int read;
-                                while ((read = inStream.read(inData)) != -1) {
-                                    output.write(inData, 0, read);
-                                    if(file.length()/1024>300 && !audioLoaded)
-                                        playAudio(file);
-                                }
-                                temp = true;
-                                output.flush();
-                            } catch (IOException e) {
-                                e.printStackTrace();
                             }
-                        }
+                        });
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -266,29 +264,162 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         receiveDataThread.start();
     }
 
-    private void decodeDcip(String data) {
-        if(data.contains("02C0013D"))
+    private void decodeDcip(String data, int read) throws IOException {
+        if(data.contains("02C303"))
+        {
+            for(int i = 0; i < read/5;i++)
+            {
+                short s = (short)getDataFromHex(data,(i*10)+6,4);
+                writeToFile(s);
+                writeInWav(s);
+            }
+        }
+
+        else if(data.contains("02C0013D"))
         {
             print("received hi from device");
-            updateUiConnected();
+            sendData(connectedSocket,"getPcg");
+//            updateUiConnected();
         }
 
         else if(data.contains("02C202"))
         {
             print("received device info");
-            btDevices.add(new btDevice("Version",String.valueOf(getDataFromHex(data,6))));
+            btDevices.add(new btDevice("Version",String.valueOf(getDataFromHex(data,6,2))));
             createList();
         }
 
         else if(data.contains("02C10201"))
         {
             print("pcg incoming");
-            temp = false;
+            fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/list.txt"));
+        }
+
+    }
+
+    private void writeToFile(short s) throws IOException {
+        fos.write(String.valueOf(s).getBytes());
+        fos.write("\n".getBytes());
+    }
+
+    private boolean ifWavMade = false;
+
+    private void writeInWav(short s) throws IOException {
+        File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/songTest.wav");
+        if(!ifWavMade)
+        {
+            ifWavMade = true;
+            byte[] header = new byte[44];
+            byte[] data = get16BitPcm(s);
+
+            long totalDataLen = data.length + 36;
+            long bitrate = sampleRate * 16;
+
+            header[0] = 'R';
+            header[1] = 'I';
+            header[2] = 'F';
+            header[3] = 'F';
+            header[4] = (byte) (totalDataLen & 0xff);
+            header[5] = (byte) ((totalDataLen >> 8) & 0xff);
+            header[6] = (byte) ((totalDataLen >> 16) & 0xff);
+            header[7] = (byte) ((totalDataLen >> 24) & 0xff);
+            header[8] = 'W';
+            header[9] = 'A';
+            header[10] = 'V';
+            header[11] = 'E';
+            header[12] = 'f';
+            header[13] = 'm';
+            header[14] = 't';
+            header[15] = ' ';
+            header[16] = (byte) 16;
+            header[17] = 0;
+            header[18] = 0;
+            header[19] = 0;
+            header[20] = 1;
+            header[21] = 0;
+            header[22] = (byte) 1;
+            header[23] = 0;
+            header[24] = (byte) (sampleRate & 0xff);
+            header[25] = (byte) ((sampleRate >> 8) & 0xff);
+            header[26] = (byte) ((sampleRate >> 16) & 0xff);
+            header[27] = (byte) ((sampleRate >> 24) & 0xff);
+            header[28] = (byte) ((bitrate / 8) & 0xff);
+            header[29] = (byte) (((bitrate / 8) >> 8) & 0xff);
+            header[30] = (byte) (((bitrate / 8) >> 16) & 0xff);
+            header[31] = (byte) (((bitrate / 8) >> 24) & 0xff);
+            header[32] = (byte) ((16) / 8);
+            header[33] = 0;
+            header[34] = 16;
+            header[35] = 0;
+            header[36] = 'd';
+            header[37] = 'a';
+            header[38] = 't';
+            header[39] = 'a';
+            header[40] = (byte) (data.length  & 0xff);
+            header[41] = (byte) ((data.length >> 8) & 0xff);
+            header[42] = (byte) ((data.length >> 16) & 0xff);
+            header[43] = (byte) ((data.length >> 24) & 0xff);
+
+            FileOutputStream os = new FileOutputStream(f,false);
+            os.write(header, 0, 44);
+            os.write(data);
+            os.close();
+        }
+        else
+        {
+            byte[] wavBytes =  readFileToByteArray(f);
+            int existingSize = wavBytes.length;
+            byte[] newPart = get16BitPcm(s);
+            int newSize = existingSize+newPart.length-44;
+            int newTotal = newSize+44;
+
+            wavBytes[4] = (byte) (newSize+36 & 0xff);
+            wavBytes[5] = (byte) ((newSize+36 >> 8) & 0xff);
+            wavBytes[6] = (byte) ((newSize+36 >> 16) & 0xff);
+            wavBytes[7] = (byte) ((newSize+36 >> 24) & 0xff);
+            wavBytes[40] = (byte) (newSize  & 0xff);
+            wavBytes[41] = (byte) ((newSize >> 8) & 0xff);
+            wavBytes[42] = (byte) ((newSize >> 16) & 0xff);
+            wavBytes[43] = (byte) ((newSize >> 24) & 0xff);
+
+            byte[] finalWav = new byte[newTotal];
+            int cnt = 0;
+            while(cnt<newTotal)
+            {
+                if(cnt<existingSize)
+                    finalWav[cnt] = wavBytes[cnt];
+                else
+                    finalWav[cnt] = newPart[cnt-existingSize];
+                cnt++;
+            }
+            FileOutputStream os = new FileOutputStream(f,false);
+            os.write(finalWav);
+            os.close();
         }
     }
 
-    private int getDataFromHex(String str, int i) {
-        String sliced = str.substring(i,i+2);
+    private byte[] readFileToByteArray(File f) {
+        int size = (int) f.length();
+        byte[] bytes = new byte[size];
+        try {
+            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(f));
+            buf.read(bytes, 0, bytes.length);
+            buf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bytes;
+    }
+
+    private byte[] get16BitPcm(short s) {
+        byte[] b = new byte[2];
+        b[0] = (byte)(s & 0xff);
+        b[1] = (byte)((s >> 8) & 0xff);
+        return b;
+    }
+
+    private int getDataFromHex(String str, int i, int bytes) {
+        String sliced = str.substring(i,i+bytes);
         return Integer.parseInt(sliced,16);
     }
 
@@ -408,28 +539,25 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         }).start();
     }
 
-    private boolean ifEqDone = false;
+//    private boolean ifEqDone = false;
 
-    private void eq2(File file) {
-        new AndroidFFMPEGLocator(this);
-        final AudioDispatcher adp = AudioDispatcherFactory.fromPipe(file.getAbsolutePath(), 32000, 1024, 0);
-        final TarsosDSPAudioFormat format = adp.getFormat();
-
-        adp.addAudioProcessor(new BandPass(1000,100,32000));
-        RandomAccessFile raf = null;
-        try {
-            raf = new RandomAccessFile(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audioFiltered.wav", "rw");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        adp.addAudioProcessor(new WriterProcessor(format,raf));
-        adp.run();
-        print("running filter");
-
-        Thread audioThread = new Thread(adp, "Audio Thread");
-        audioThread.start();
-
-    }
+//    private void eq2(File file, int minBufferSize) throws FileNotFoundException {
+//        new AndroidFFMPEGLocator(this);
+//        InputStream inputStream = new FileInputStream(file);
+//        TarsosDSPAudioFormat format =  new TarsosDSPAudioFormat(sampleRate,16,1,true,false);
+//        AudioDispatcher adp = new AudioDispatcher(new UniversalAudioInputStream(inputStream,format),minBufferSize,0);
+//
+////        adp.addAudioProcessor(new RateTransposer(4.0d));
+////        adp.addAudioProcessor(new RateTransposer(3.0d));
+////        adp.addAudioProcessor(new LowPassFS(500,sampleRate));
+////        adp.addAudioProcessor(new LowPassFS(500,sampleRate));
+////        adp.addAudioProcessor(new LowPassFS(500,sampleRate));
+//        adp.addAudioProcessor(new GainProcessor(6d));
+//        adp.addAudioProcessor(new AndroidAudioPlayer(format,minBufferSize, AudioManager.STREAM_MUSIC));
+//        RandomAccessFile raf = new RandomAccessFile(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audioFiltered1.wav", "rw");
+//        adp.addAudioProcessor(new WriterProcessor(format,raf));
+//        new Thread(adp, "Sound Thread").start();
+//    }
 
     private void updateUiPcg() {
         lungButton.setAlpha(1);
@@ -514,16 +642,10 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         unregisterReceiver(receiver);
     }
 
-    private void print(String s)
+    private void print(Object s)
     {
 //        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-        Log.d("customm",s);
-    }
-
-    private void print(int i)
-    {
-//        Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
-        Log.d("customm",String.valueOf(i));
+        Log.d("customm", String.valueOf(s));
     }
 
     @Override
