@@ -1,2 +1,3 @@
+include ':graphviewlibrary'
 include ':app'
 rootProject.name='SIH'

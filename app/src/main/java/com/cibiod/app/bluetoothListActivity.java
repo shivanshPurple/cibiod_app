@@ -148,37 +148,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         });
     }
 
-    private void attachEq(String mode) {
-        Equalizer eq = new Equalizer(100,at.getAudioSessionId());
-        short[] freqRange = eq.getBandLevelRange();
-        short minLvl = freqRange[0];
-
-        switch(mode)
-        {
-            case "lung":
-                eq.setBandLevel((short) 2,minLvl);
-                eq.setBandLevel((short) 3,minLvl);
-                eq.setBandLevel((short) 4,minLvl);
-                break;
-
-            case "heart":
-                eq.setBandLevel((short) 0,minLvl);
-                eq.setBandLevel((short) 1,minLvl);
-                eq.setBandLevel((short) 2,minLvl);
-                eq.setBandLevel((short) 3,minLvl);
-                eq.setBandLevel((short) 4,minLvl);
-                break;
-
-            default:
-                eq.setBandLevel((short) 0,(short)0);
-                eq.setBandLevel((short) 1,(short)0);
-                eq.setBandLevel((short) 2,(short)0);
-                eq.setBandLevel((short) 3,(short)0);
-                eq.setBandLevel((short) 4,(short)0);
-        }
-        eq.setEnabled(true);
-    }
-
     private BluetoothSocket connectedSocket;
 
     private void openServer() {
@@ -264,14 +233,18 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         receiveDataThread.start();
     }
 
-    private void decodeDcip(String data, int read) throws IOException {
+    private void decodeDcip(final String data, final int read) throws IOException {
         if(data.contains("02C303"))
         {
             for(int i = 0; i < read/5;i++)
             {
                 short s = (short)getDataFromHex(data,(i*10)+6,4);
-                writeToFile(s);
-                writeInWav(s);
+                try {
+                    writeToFile(s);
+                    writeInWav(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -279,7 +252,11 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         {
             print("received hi from device");
             sendData(connectedSocket,"getPcg");
-//            updateUiConnected();
+            updateUiConnected();
+            File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/songTest.wav");
+            File f2 = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/list.txt");
+            f.delete();
+            f2.delete();
         }
 
         else if(data.contains("02C202"))
@@ -308,7 +285,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/songTest.wav");
         if(!ifWavMade)
         {
-            ifWavMade = true;
             byte[] header = new byte[44];
             byte[] data = get16BitPcm(s);
 
@@ -364,6 +340,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
             os.write(header, 0, 44);
             os.write(data);
             os.close();
+            ifWavMade = true;
         }
         else
         {
@@ -372,7 +349,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
             byte[] newPart = get16BitPcm(s);
             int newSize = existingSize+newPart.length-44;
             int newTotal = newSize+44;
-
             wavBytes[4] = (byte) (newSize+36 & 0xff);
             wavBytes[5] = (byte) ((newSize+36 >> 8) & 0xff);
             wavBytes[6] = (byte) ((newSize+36 >> 16) & 0xff);
@@ -567,21 +543,21 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         lungButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attachEq("lung");
+//                attachEq("lung");
             }
         });
 
         heartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attachEq("heart");
+//                attachEq("heart");
             }
         });
 
         allModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attachEq("all");
+//                attachEq("all");
             }
         });
 
