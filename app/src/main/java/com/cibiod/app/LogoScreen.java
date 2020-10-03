@@ -21,8 +21,6 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class LogoScreen extends AppCompatActivity {
-//    private ImageView circle;
-    private boolean isPressed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,44 +37,6 @@ public class LogoScreen extends AppCompatActivity {
         requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE}, 1);
 
         logo.startAnimation(fadeIn);
-//        circle.startAnimation(fadeIn2);
-
-        logo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                circle.clearAnimation();
-//                circle.startAnimation(zoomIn);
-                isPressed = true;
-
-                Handler mHandler = new Handler();
-                mHandler.postDelayed(new Runnable() {
-                    public void run() {
-                        startApp();
-                    }
-                }, 1000);
-            }
-        });
-
-        final Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-            if(!isPressed)
-            {
-                heartbeatAnim();
-                handler.postDelayed(this, 1500);
-            }
-            }
-        };
-
-        handler.postDelayed(runnable, 1000);
-    }
-
-    private void heartbeatAnim()
-    {
-        Animation heartBeat = AnimationUtils.loadAnimation(this,R.anim.blink_anim);
-//        circle.startAnimation(heartBeat);
-
     }
 
     private void startApp()

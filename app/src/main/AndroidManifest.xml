@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".WavformActivity"></activity>
+        <activity android:name=".bluetoothListActivity" />
         <activity android:name=".LogoScreen" />
         <activity
             android:name=".patientEntry"
@@ -25,7 +25,7 @@
             android:name=".nearestTowers"
             android:noHistory="true" />
         <activity
-            android:name=".bluetoothListActivity"
+            android:name=".WavformActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
