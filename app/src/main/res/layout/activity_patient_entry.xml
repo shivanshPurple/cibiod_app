@@ -34,7 +34,7 @@
         android:id="@+id/newPatientButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/lightblue"
+        android:background="@color/colorBlue"
         android:text="Button"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="@+id/recyclerView"

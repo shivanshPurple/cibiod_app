@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".LogoScreen">
 
     <TextView
@@ -12,40 +13,20 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:fontFamily="sans-serif-light"
-        android:text="CONNECTING TO STEHTOSCOPE"
+        android:text="SWIPE UP"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/logo"
-        android:layout_width="280dp"
-        android:layout_height="200dp"
-        android:layout_gravity="center"
-        android:adjustViewBounds="false"
-        android:background="#00FFFFFF"
-        android:cropToPadding="false"
-        android:scaleType="fitCenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/logo" />
-
-    <ImageButton
-        android:id="@+id/bluetoothIcon"
-        android:layout_width="30dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:adjustViewBounds="false"
-        android:alpha="0.5"
-        android:background="#00FFFFFF"
-        android:cropToPadding="false"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/bluetooth" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

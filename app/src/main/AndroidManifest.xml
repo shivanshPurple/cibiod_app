@@ -16,17 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".bluetoothListActivity" />
+        <activity android:name=".IntroScreen" />
         <activity android:name=".LogoScreen" />
-        <activity
-            android:name=".patientEntry"
-            android:noHistory="true" />
-        <activity
-            android:name=".nearestTowers"
-            android:noHistory="true" />
-        <activity
-            android:name=".WavformActivity"
-            android:noHistory="true">
+        <activity android:name=".WavformActivity" />
+        <activity android:name=".patientEntry" />
+        <activity android:name=".nearestTowers" />
+        <activity android:name=".bluetoothListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -49,6 +44,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAz2Acg9MbV8AwgeoAkSrnaG1_8psYY054" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
