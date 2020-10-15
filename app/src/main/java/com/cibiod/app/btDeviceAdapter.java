@@ -1,7 +1,6 @@
 package com.cibiod.app;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,8 +64,8 @@ public class btDeviceAdapter extends RecyclerView.Adapter<btDeviceAdapter.ViewHo
                 public void onClick(View v) {
                     try {
                         mRecyclerClickInterface.OnItemClick(getAdapterPosition());
-                    } catch (IOException e) {
-                        Log.d("customm","socket connection failed");
+                    } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             });

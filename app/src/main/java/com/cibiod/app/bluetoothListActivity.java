@@ -1,5 +1,6 @@
 package com.cibiod.app;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -9,16 +10,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.AudioAttributes;
+import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.anand.brose.graphviewlibrary.GraphView;
-import com.anand.brose.graphviewlibrary.WaveSample;
+//import com.anand.brose.graphviewlibrary.GraphView;
+//import com.anand.brose.graphviewlibrary.WaveSample;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -28,9 +38,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,22 +51,31 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.GainProcessor;
+import be.tarsos.dsp.io.TarsosDSPAudioFormat;
+import be.tarsos.dsp.io.UniversalAudioInputStream;
+import be.tarsos.dsp.io.android.AndroidAudioPlayer;
+import be.tarsos.dsp.io.android.AndroidFFMPEGLocator;
+import be.tarsos.dsp.resample.RateTransposer;
+import be.tarsos.dsp.writer.WriterProcessor;
 
 public class bluetoothListActivity extends AppCompatActivity implements recyclerClickInterface{
     private BluetoothAdapter bluetoothAdapter;
     private RecyclerView rv;
     private ArrayList<btDevice> btDevices = new ArrayList<>();
     private SharedPreferences prefs;
-    private static UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private AudioTrack at;
     private boolean audioLoaded = false;
-    private TextView connectionText, batteryText;
-    private Button whoButton, getPcgButton, lungButton, heartButton, allModeButton, goodbyeButton;
     private Thread receiveDataThread;
+    private TextView connectionText, batteryText, temperatureText, hrText, dataLossText;
+    private LineGraphSeries<DataPoint> pcgSeries, ecgSeries;
+    private int sampleRate = 4000, minBufferSize;
 
-
-    private List<WaveSample> points = new ArrayList<>();
-
+    private String audio500path = Environment.getExternalStorageDirectory()+ "/cibiodLogs/songTest.wav",
+            audio4000path = Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio4000hz.wav",
+            listPath = Environment.getExternalStorageDirectory()+ "/cibiodLogs/list1.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,26 +85,52 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         rv = findViewById(R.id.btListView);
         connectionText = findViewById(R.id.connectionText);
         batteryText = findViewById(R.id.batteryText);
-        whoButton = findViewById(R.id.whoButton);
-        getPcgButton = findViewById(R.id.getPcgButton);
-        lungButton = findViewById(R.id.lungButton);
-        heartButton = findViewById(R.id.heartButton);
-        allModeButton = findViewById(R.id.allModeButton);
-        goodbyeButton = findViewById(R.id.goodbyeButton);
+        temperatureText = findViewById(R.id.temperatureText);
+        hrText = findViewById(R.id.hrText);
+        dataLossText = findViewById(R.id.dataLossText);
 
-        GraphView graphView = findViewById(R.id.graphView);
-        graphView.setMaxAmplitude(Short.MAX_VALUE);
-        graphView.setMasterList(points);
-        graphView.startPlotting();
+        GraphView pcgGraph = findViewById(R.id.graphViewPcg);
+        pcgSeries = new LineGraphSeries<>();
+        pcgGraph.addSeries(pcgSeries);
+        pcgGraph.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+        pcgGraph.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        pcgGraph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
+        pcgSeries.setThickness(2);
+
+        Viewport viewportPcg = pcgGraph.getViewport();
+        viewportPcg.setYAxisBoundsManual(true);
+        viewportPcg.setMaxY(6000);
+        viewportPcg.setMinY(-6000);
+        viewportPcg.setXAxisBoundsManual(true);
+        viewportPcg.setMaxX(5000);
+        viewportPcg.setMinX(0);
+        viewportPcg.setScrollable(true);
+
+        GraphView ecgGraph = findViewById(R.id.graphViewEcg);
+        ecgSeries = new LineGraphSeries<>();
+        ecgGraph.addSeries(ecgSeries);
+        ecgGraph.getGridLabelRenderer().setHorizontalLabelsVisible(false);
+        ecgGraph.getGridLabelRenderer().setVerticalLabelsVisible(false);
+        ecgGraph.getGridLabelRenderer().setGridStyle(GridLabelRenderer.GridStyle.NONE);
+        ecgSeries.setThickness(2);
+
+        Viewport viewportEcg = ecgGraph.getViewport();
+        viewportEcg.setYAxisBoundsManual(true);
+        viewportEcg.setMaxY(750);
+        viewportEcg.setMinY(-750);
+        viewportEcg.setXAxisBoundsManual(true);
+        viewportEcg.setMaxX(5000);
+        viewportEcg.setMinX(0);
 
         initializeUiAndListener();
 
-//        int minBufferSize = AudioTrack.getMinBufferSize(sampleRate,
-//                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-//
-//        minBufferSize *= 2;
+        minBufferSize = AudioTrack.getMinBufferSize(sampleRate,
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
+        minBufferSize *= 2;
+
 //        at = new AudioTrack(AudioManager.USE_DEFAULT_STREAM_TYPE, sampleRate,
-//                AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT,
+//                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
 //                minBufferSize, AudioTrack.MODE_STREAM);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -101,44 +149,101 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         {
             requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 14);
             prefs = getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
+            startBluetoothService();
+        }
+    }
+
+    private void playFile(String filePath, int position) {
+        try {
+            final MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(filePath);
+            mediaPlayer.setAudioAttributes(
+                    new AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+            );
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            if(position!=0)
+                mediaPlayer.seekTo(position);
+            Thread stateChangeListener = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int prevPosition = 0;
+                    while(true)
+                    {
+                        if(!mediaPlayer.isPlaying())
+                        {
+                            mediaPlayer.reset();
+                            playFile(audio500path,prevPosition);
+                            break;
+                        }
+                        else
+                            prevPosition = mediaPlayer.getCurrentPosition();
+                    }
+                }
+            });
+
+            stateChangeListener.setPriority(Thread.NORM_PRIORITY);
+            stateChangeListener.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startBluetoothService() {
 //            openServer();
 //            searchDevices();
 //            File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.wav");
 //            playAudio(f);
-//            try {
-//                eq2(f, 1024);
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
 //            searchDevices();
-            searchBondedDevices();
-        }
+//            searchBondedDevices();
 
+        BluetoothDevice toConnectBtDevice = bluetoothAdapter.getRemoteDevice("00:01:95:4A:46:7A");
+
+        BluetoothSocket btSocket = null;
+        try {
+            btSocket = toConnectBtDevice.createRfcommSocketToServiceRecord(uuid);
+            btSocket.connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        connectedSocket = btSocket;
+        connectionText.setText("Connected!");
+
+        try {
+            fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/list1.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        receiveData();
     }
+
     private FileOutputStream fos;
 
     private void initializeUiAndListener() {
-        batteryText.setAlpha(0);
-        whoButton.setAlpha(0);
-        getPcgButton.setAlpha(0);
-        lungButton.setAlpha(0);
-        heartButton.setAlpha(0);
-        allModeButton.setAlpha(0);
-        goodbyeButton.setAlpha(0);
-
-        whoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendData("who");
-            }
-        });
-
-        getPcgButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendData("getPcg");
-            }
-        });
+//        batteryText.setAlpha(0);
+//        whoButton.setAlpha(0);
+//        getPcgButton.setAlpha(0);
+//        lungButton.setAlpha(0);
+//        heartButton.setAlpha(0);
+//        allModeButton.setAlpha(0);
+//        goodbyeButton.setAlpha(0);
+//
+//        whoButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                sendData("who");
+//            }
+//        });
+//
+//        getPcgButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                sendData("getPcg");
+//            }
+//        });
     }
 
     private BluetoothSocket connectedSocket;
@@ -174,6 +279,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         }).start();
     }
 
+    private StringBuffer dataBuffer = new StringBuffer();
     private void receiveData() {
         receiveDataThread = new Thread() {
             @Override
@@ -182,7 +288,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 try{
                     inStream = connectedSocket.getInputStream();
                     print("recieving data");
-                    sendData("getPcg");
 
                     byte[] inData = new byte[1024];
                     int read;
@@ -190,16 +295,12 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                         assert inStream != null;
                         read = inStream.read(inData);
                         byte[] extractedData = Arrays.copyOfRange(inData, 0, read);
-                        final String data = convertByteToString(extractedData);
+                        dataBuffer.append(convertByteToString(extractedData));
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                try {
-                                    print(data);
-                                    decodeDcip(data);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                            if(dataBuffer.length()>=12)
+                                decodeDcip();
                             }
                         });
                     }
@@ -210,191 +311,275 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         };
 
         receiveDataThread.start();
-    }
-
-    private void decodeDcip(final String data) throws IOException {
-        if(data.contains("02C303"))
-        {
-//            getListOfCommands(data);
-//            for(int i = 0; i < read/6;i++)
-//            {
-//                short s = (short)getDataFromHex(data,(i*12)+6,4);
-//                points.add(new WaveSample(2,s));
-////                    writeToFile(s);
-////                    writeInWav(s);
-//            }
-        }
-
-        else if(data.contains("02C0013D"))
-        {
-            print("received hi from device");
-            sendData("getPcg");
-            updateUiConnected();
-            File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/songTest.wav");
-            File f2 = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/list.txt");
-            f.delete();
-            f2.delete();
-        }
-
-        else if(data.contains("02C202"))
-        {
-            print("received device info");
-            btDevices.add(new btDevice("Version",String.valueOf(getDataFromHex(data,6,2))));
-            createList();
-        }
-
-        else if(data.contains("02C10201"))
-        {
-            print("pcg incoming");
-            fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/list.txt"));
-        }
 
     }
 
-    private void getListOfCommands(String data)
-    {
-        short[] dataSize = {12,14,12};
-        int beginIndex = 0, dataSizeCounter = 0;
+    private boolean getPcgSent = false;
+    private String lastUsed = "not used still";
 
-        while(true)
+    private void decodeDcip() {
+        while(dataBuffer.length()>=12)
         {
-            int endIndex = beginIndex+dataSize[dataSizeCounter];
-            String sliced = data.substring(beginIndex, endIndex);
-            beginIndex = endIndex;
-            dataSizeCounter++;
-            if(dataSizeCounter==3)
-                dataSizeCounter=0;
-            if(sliced.contains("000000"))
-                break;
+//            print("///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+            String data = dataBuffer.toString();
 
-            int pcgEcg = Integer.parseInt(sliced.substring(5,9),16);
-
-            if(sliced.contains("02C303"))
+            if(data.startsWith("02C306"))
             {
-                print("pcg is "+pcgEcg);
+                if(data.length()>=18)
+                {
+                    if(checksumOk(data.substring(0,16),data.substring(16,18)))
+                    {
+                        lastUsed=data;
+                        wasPrevProcessed = true;
+                        short pcg = (short) getDataFromHex(data.substring(6,10),0,4);
+                        short ecg = (short) getDataFromHex(data.substring(10,14),0,4);
+                        int hr = getDataFromHex(data.substring(14,16),0,2);
+                        dataBuffer.delete(0,18);
+                        hrText.setText("Heart Rate is "+hr);
+                        plot(pcg,ecg);
+                    }
+                }
             }
 
-            else if(sliced.contains("02C404"))
+            else if(data.startsWith("02C503") & data.length()>=12)
             {
-                print("ecg is "+pcgEcg);
+                if(checksumOk(data.substring(0,10),data.substring(10,12)))
+                {
+                    lastUsed=data;
+                    wasPrevProcessed = true;
+                    int battery = getDataFromHex(data.substring(6,8),0,2);
+                    int version = getDataFromHex(data.substring(8,10),0,2);
+                    dataBuffer.delete(0,12);
+                    if(!getPcgSent)
+                    {
+                        getPcgSent = true;
+                        sendData("getPcg");
+                    }
+                    batteryText.setText("Battery is "+battery);
+                }
             }
-
-            else if(sliced.contains("02C503"))
+            else if(data.startsWith("02C403") & data.length()>=12)
             {
-                int battery = Integer.parseInt(sliced.substring(5,7),16);
-                int version = Integer.parseInt(sliced.substring(7,9),16);
-                print("battery is "+battery);
-                print("version is "+version);
+                if(checksumOk(data.substring(0,10),data.substring(10,12)))
+                {
+                    lastUsed=data;
+                    wasPrevProcessed = true;
+                    int temperature = getDataFromHex(data.substring(6,10),0,4);
+                    dataBuffer.delete(0,12);
+                    temperatureText.setText("Temperature is "+(float)temperature/10);
+                }
+            }
+            else
+            {
+                discardUnitllNext();
             }
         }
-        print("from "+data);
     }
 
-    private int getDataFromHex(String str, int i, int bytes) {
-        String sliced = str.substring(i,i+bytes);
+    private boolean plotting = false;
+    private Short[] pcgArr = new Short[100000], ecgArr = new Short[100000];
+    private int i = 0, j = 0;
+
+    private void plot(short pcg, short ecg) {
+        pcgArr[j] = pcg;
+//        ecgArr[j] = ecg;
+        j++;
+//        writeToFile(pcg);
+        writeInWav(pcg);
+
+        //plotting the graph, called once only
+        if(!plotting & j>4000)
+        {
+            plotting = true;
+            Thread plottingThread = new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    print("plotting and playing started");
+                    playFile(audio500path, 0);
+                    while (true) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (pcgArr[i] != null) {
+                                    pcgSeries.appendData(new DataPoint(i * 2, pcgArr[i]), true, 7500);
+                                }
+//                                ecgSeries.appendData(new DataPoint(i*2,ecgArr[i]),true,7500);
+                            }
+                        });
+                        i++;
+                        try {
+                            Thread.sleep(2);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            };
+
+            plottingThread.setPriority(Thread.MAX_PRIORITY);
+            plottingThread.start();
+        }
+    }
+
+    private int total = 0;
+    private int dataLoss = 0;
+    private boolean wasPrevProcessed = false;
+
+    @SuppressLint("SetTextI18n")
+    private void discardUnitllNext() {
+        if(wasPrevProcessed)
+        {
+            dataLoss++;
+            total++;
+        }
+        wasPrevProcessed = false;
+        dataLossText.setText("Data loss is "+((float)dataLoss/total*100)+"%");
+        dataBuffer.delete(0,2);
+    }
+
+    private boolean checksumOk(String hex, String cs) {
+        List<String> ret = new ArrayList<>((hex.length() + 1) / 2);
+        for (int start = 0; start < hex.length(); start += 2) {
+            ret.add(hex.substring(start, Math.min(hex.length(), start + 2)));
+        }
+        String[] splitArr = ret.toArray(new String[0]);
+        int sumInt = 0;
+        for(String p:splitArr)
+        {
+            sumInt+=Integer.parseInt(p,16);
+        }
+        sumInt=~sumInt;
+        sumInt++;
+        String calcChecksum = Integer.toHexString(sumInt);
+        calcChecksum = calcChecksum.substring(calcChecksum.length()-2).toUpperCase();
+
+        if(calcChecksum.equals(cs))
+        {
+            total++;
+            return true;
+        }
+
+        else
+        {
+            discardUnitllNext();
+            return false;
+        }
+    }
+
+    private int getDataFromHex(String str, int i, int chars) {
+        String sliced = str.substring(i,i+chars);
         return Integer.parseInt(sliced,16);
     }
 
-    private void writeToFile(short s) throws IOException {
-        fos.write(String.valueOf(s).getBytes());
-        fos.write("\n".getBytes());
+    private void writeToFile(short s) {
+        try {
+            fos.write(String.valueOf(s).getBytes());
+            fos.write("\n".getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean ifWavMade = false;
 
-    private void writeInWav(short s) throws IOException {
-        File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/songTest.wav");
-        if(!ifWavMade)
+    private void writeInWav(short s) {
+        try
         {
-            byte[] header = new byte[44];
-            byte[] data = get16BitPcm(s);
-
-            long totalDataLen = data.length + 36;
-            int sampleRate = 22050;
-            long bitrate = sampleRate * 16;
-
-            header[0] = 'R';
-            header[1] = 'I';
-            header[2] = 'F';
-            header[3] = 'F';
-            header[4] = (byte) (totalDataLen & 0xff);
-            header[5] = (byte) ((totalDataLen >> 8) & 0xff);
-            header[6] = (byte) ((totalDataLen >> 16) & 0xff);
-            header[7] = (byte) ((totalDataLen >> 24) & 0xff);
-            header[8] = 'W';
-            header[9] = 'A';
-            header[10] = 'V';
-            header[11] = 'E';
-            header[12] = 'f';
-            header[13] = 'm';
-            header[14] = 't';
-            header[15] = ' ';
-            header[16] = (byte) 16;
-            header[17] = 0;
-            header[18] = 0;
-            header[19] = 0;
-            header[20] = 1;
-            header[21] = 0;
-            header[22] = (byte) 1;
-            header[23] = 0;
-            header[24] = (byte) (sampleRate & 0xff);
-            header[25] = (byte) ((sampleRate >> 8) & 0xff);
-            header[26] = (byte) ((sampleRate >> 16) & 0xff);
-            header[27] = (byte) ((sampleRate >> 24) & 0xff);
-            header[28] = (byte) ((bitrate / 8) & 0xff);
-            header[29] = (byte) (((bitrate / 8) >> 8) & 0xff);
-            header[30] = (byte) (((bitrate / 8) >> 16) & 0xff);
-            header[31] = (byte) (((bitrate / 8) >> 24) & 0xff);
-            header[32] = (byte) ((16) / 8);
-            header[33] = 0;
-            header[34] = 16;
-            header[35] = 0;
-            header[36] = 'd';
-            header[37] = 'a';
-            header[38] = 't';
-            header[39] = 'a';
-            header[40] = (byte) (data.length  & 0xff);
-            header[41] = (byte) ((data.length >> 8) & 0xff);
-            header[42] = (byte) ((data.length >> 16) & 0xff);
-            header[43] = (byte) ((data.length >> 24) & 0xff);
-
-            FileOutputStream os = new FileOutputStream(f,false);
-            os.write(header, 0, 44);
-            os.write(data);
-            os.close();
-            ifWavMade = true;
-        }
-        else
-        {
-            byte[] wavBytes =  readFileToByteArray(f);
-            int existingSize = wavBytes.length;
-            byte[] newPart = get16BitPcm(s);
-            int newSize = existingSize+newPart.length-44;
-            int newTotal = newSize+44;
-            wavBytes[4] = (byte) (newSize+36 & 0xff);
-            wavBytes[5] = (byte) ((newSize+36 >> 8) & 0xff);
-            wavBytes[6] = (byte) ((newSize+36 >> 16) & 0xff);
-            wavBytes[7] = (byte) ((newSize+36 >> 24) & 0xff);
-            wavBytes[40] = (byte) (newSize  & 0xff);
-            wavBytes[41] = (byte) ((newSize >> 8) & 0xff);
-            wavBytes[42] = (byte) ((newSize >> 16) & 0xff);
-            wavBytes[43] = (byte) ((newSize >> 24) & 0xff);
-
-            byte[] finalWav = new byte[newTotal];
-            int cnt = 0;
-            while(cnt<newTotal)
+            File f = new File(audio500path);
+            if(!ifWavMade)
             {
-                if(cnt<existingSize)
-                    finalWav[cnt] = wavBytes[cnt];
-                else
-                    finalWav[cnt] = newPart[cnt-existingSize];
-                cnt++;
+                byte[] header = new byte[44];
+                byte[] data = get16BitPcm(s);
+
+                long totalDataLen = data.length + 36;
+                int sampleRate = 500;
+                long bitrate = sampleRate * 16;
+
+                header[0] = 'R';
+                header[1] = 'I';
+                header[2] = 'F';
+                header[3] = 'F';
+                header[4] = (byte) (totalDataLen & 0xff);
+                header[5] = (byte) ((totalDataLen >> 8) & 0xff);
+                header[6] = (byte) ((totalDataLen >> 16) & 0xff);
+                header[7] = (byte) ((totalDataLen >> 24) & 0xff);
+                header[8] = 'W';
+                header[9] = 'A';
+                header[10] = 'V';
+                header[11] = 'E';
+                header[12] = 'f';
+                header[13] = 'm';
+                header[14] = 't';
+                header[15] = ' ';
+                header[16] = (byte) 16;
+                header[17] = 0;
+                header[18] = 0;
+                header[19] = 0;
+                header[20] = 1;
+                header[21] = 0;
+                header[22] = (byte) 1;
+                header[23] = 0;
+                header[24] = (byte) (sampleRate & 0xff);
+                header[25] = (byte) ((sampleRate >> 8) & 0xff);
+                header[26] = (byte) ((sampleRate >> 16) & 0xff);
+                header[27] = (byte) ((sampleRate >> 24) & 0xff);
+                header[28] = (byte) ((bitrate / 8) & 0xff);
+                header[29] = (byte) (((bitrate / 8) >> 8) & 0xff);
+                header[30] = (byte) (((bitrate / 8) >> 16) & 0xff);
+                header[31] = (byte) (((bitrate / 8) >> 24) & 0xff);
+                header[32] = (byte) ((16) / 8);
+                header[33] = 0;
+                header[34] = 16;
+                header[35] = 0;
+                header[36] = 'd';
+                header[37] = 'a';
+                header[38] = 't';
+                header[39] = 'a';
+                header[40] = (byte) (data.length  & 0xff);
+                header[41] = (byte) ((data.length >> 8) & 0xff);
+                header[42] = (byte) ((data.length >> 16) & 0xff);
+                header[43] = (byte) ((data.length >> 24) & 0xff);
+
+                FileOutputStream os = new FileOutputStream(f,false);
+                os.write(header, 0, 44);
+                os.write(data);
+                ifWavMade = true;
             }
-            FileOutputStream os = new FileOutputStream(f,false);
-            os.write(finalWav);
-            os.close();
+            else
+            {
+                byte[] wavBytes =  readFileToByteArray(f);
+                int existingSize = wavBytes.length;
+                byte[] newPart = get16BitPcm(s);
+                int newSize = existingSize+newPart.length-44;
+                int newTotal = newSize+44;
+                wavBytes[4] = (byte) (newSize+36 & 0xff);
+                wavBytes[5] = (byte) ((newSize+36 >> 8) & 0xff);
+                wavBytes[6] = (byte) ((newSize+36 >> 16) & 0xff);
+                wavBytes[7] = (byte) ((newSize+36 >> 24) & 0xff);
+                wavBytes[40] = (byte) (newSize  & 0xff);
+                wavBytes[41] = (byte) ((newSize >> 8) & 0xff);
+                wavBytes[42] = (byte) ((newSize >> 16) & 0xff);
+                wavBytes[43] = (byte) ((newSize >> 24) & 0xff);
+
+                byte[] finalWav = new byte[newTotal];
+                int cnt = 0;
+                while(cnt<newTotal)
+                {
+                    if(cnt<existingSize)
+                        finalWav[cnt] = wavBytes[cnt];
+                    else
+                        finalWav[cnt] = newPart[cnt-existingSize];
+                    cnt++;
+                }
+                FileOutputStream os = new FileOutputStream(f,false);
+                os.write(finalWav);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
 
     private byte[] readFileToByteArray(File f) throws IOException {
         int size = (int) f.length();
@@ -410,13 +595,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         b[0] = (byte)(s & 0xff);
         b[1] = (byte)((s >> 8) & 0xff);
         return b;
-    }
-
-    private void updateUiConnected() {
-        connectionText.setText("Connected!");
-        batteryText.setAlpha(1);
-        whoButton.setAlpha(1);
-        getPcgButton.setAlpha(1);
     }
 
     final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
@@ -499,10 +677,10 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                     if(!audioLoaded)
                     {
                         audioLoaded = true;
-                        updateUiPcg();
                         try {
                             inStreamAudio = new FileInputStream(file);
                             at.play();
+                            print("audio started!");
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -514,6 +692,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                         }
                         else
                         {
+                            print("audio stopped!");
                             at.stop();
                             at.release();
                             break;
@@ -529,57 +708,21 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 
 //    private boolean ifEqDone = false;
 
-//    private void eq2(File file, int minBufferSize) throws FileNotFoundException {
+//    private void dsp(FileInputStream inputStream) throws FileNotFoundException{
 //        new AndroidFFMPEGLocator(this);
-//        InputStream inputStream = new FileInputStream(file);
 //        TarsosDSPAudioFormat format =  new TarsosDSPAudioFormat(sampleRate,16,1,true,false);
 //        AudioDispatcher adp = new AudioDispatcher(new UniversalAudioInputStream(inputStream,format),minBufferSize,0);
 //
-////        adp.addAudioProcessor(new RateTransposer(4.0d));
-////        adp.addAudioProcessor(new RateTransposer(3.0d));
+//        adp.addAudioProcessor(new RateTransposer(4.0d));
+//        adp.addAudioProcessor(new RateTransposer(1.6203d));
 ////        adp.addAudioProcessor(new LowPassFS(500,sampleRate));
 ////        adp.addAudioProcessor(new LowPassFS(500,sampleRate));
 ////        adp.addAudioProcessor(new LowPassFS(500,sampleRate));
-//        adp.addAudioProcessor(new GainProcessor(6d));
-//        adp.addAudioProcessor(new AndroidAudioPlayer(format,minBufferSize, AudioManager.STREAM_MUSIC));
-//        RandomAccessFile raf = new RandomAccessFile(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audioFiltered1.wav", "rw");
+////        adp.addAudioProcessor(new AndroidAudioPlayer(format,minBufferSize, AudioManager.STREAM_MUSIC));
+//        RandomAccessFile raf = new RandomAccessFile(audio4000path, "rw");
 //        adp.addAudioProcessor(new WriterProcessor(format,raf));
 //        new Thread(adp, "Sound Thread").start();
 //    }
-
-    private void updateUiPcg() {
-        lungButton.setAlpha(1);
-        heartButton.setAlpha(1);
-        allModeButton.setAlpha(1);
-        goodbyeButton.setAlpha(1);
-        lungButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                attachEq("lung");
-            }
-        });
-
-        heartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                attachEq("heart");
-            }
-        });
-
-        allModeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                attachEq("all");
-            }
-        });
-
-        goodbyeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendData("bye");
-            }
-        });
-    }
 
     private void searchBondedDevices()
     {
@@ -646,14 +789,15 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("pairedStethoName",btDevices.get(position).getName());
         editor.putString("pairedStethoAddress",btDevices.get(position).getAddress());
+        print(btDevices.get(position).getAddress());
         editor.apply();
 
         BluetoothDevice toConnectBtDevice = bluetoothAdapter.getRemoteDevice(prefs.getString("pairedStethoAddress", "NA"));
 
         BluetoothSocket btSocket = toConnectBtDevice.createRfcommSocketToServiceRecord(uuid);
         btSocket.connect();
-        print("connection successful");
         connectedSocket = btSocket;
+        connectionText.setText("Connected!");
 
         receiveData();
     }
@@ -671,12 +815,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 startActivityForResult(enableBtIntent, 11);
             }
             else if(resultCode==RESULT_OK) {
-//                searchDevices();
-                try {
-                    openServer();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                startBluetoothService();
             }
         }
     }

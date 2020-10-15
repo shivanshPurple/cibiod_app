@@ -6,10 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".bluetoothListActivity">
 
-    <com.anand.brose.graphviewlibrary.GraphView
-        android:id="@+id/graphView"
+    <com.jjoe64.graphview.GraphView
+        android:id="@+id/graphViewPcg"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toTopOf="@+id/graphViewEcg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.919">
+
+    </com.jjoe64.graphview.GraphView>
+
+    <com.jjoe64.graphview.GraphView
+        android:id="@+id/graphViewEcg"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
@@ -18,9 +34,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.919" >
+        app:layout_constraintVertical_bias="0.97" >
 
-    </com.anand.brose.graphviewlibrary.GraphView>
+    </com.jjoe64.graphview.GraphView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/btListView"
@@ -58,72 +74,42 @@
         android:id="@+id/batteryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="100%"
-        app:layout_constraintBottom_toBottomOf="@+id/connectionText"
+        android:layout_marginTop="32dp"
+        android:text="Battery is 1%"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/connectionText" />
-
-    <Button
-        android:id="@+id/whoButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Who Command"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/connectionText" />
 
-    <Button
-        android:id="@+id/getPcgButton"
+    <TextView
+        android:id="@+id/temperatureText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Get Pcg"
+        android:layout_marginTop="32dp"
+        android:text="Tempertaure is 100%"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/whoButton" />
+        app:layout_constraintTop_toBottomOf="@+id/batteryText" />
 
-    <Button
-        android:id="@+id/lungButton"
+    <TextView
+        android:id="@+id/hrText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Lung"
-        app:layout_constraintEnd_toStartOf="@+id/heartButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/getPcgButton" />
-
-    <Button
-        android:id="@+id/heartButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Heart"
+        android:layout_marginTop="32dp"
+        android:text="Heart Rate is 100%"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/getPcgButton" />
+        app:layout_constraintTop_toBottomOf="@+id/temperatureText" />
 
-    <Button
-        android:id="@+id/allModeButton"
+    <TextView
+        android:id="@+id/dataLossText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="All Mode"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/heartButton"
-        app:layout_constraintTop_toBottomOf="@+id/getPcgButton" />
-
-    <Button
-        android:id="@+id/goodbyeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Disconnect"
+        android:layout_marginTop="32dp"
+        android:text="Data loss is"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/heartButton" />
+        app:layout_constraintTop_toBottomOf="@+id/hrText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
