@@ -101,7 +101,7 @@
             android:id="@+id/addTower"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorBlue"
+            android:background="@color/blue"
             android:fontFamily="sans-serif-thin"
             android:text="add location"
             android:textAlignment="center"

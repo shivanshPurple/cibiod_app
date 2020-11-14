@@ -8,13 +8,8 @@
     <string name="promptTowerType">Tower Type</string>
     <string name="actionAddTower">Add Tower</string>
     <string-array name="Gender">
-        <item>Male</item>
-        <item>Female</item>
-        <item>Other</item>
-    </string-array>
-
-    <string-array name="spinnerSharedNonShared">
-        <item>Shared</item>
-        <item>Non Shared</item>
+        <item>GENDER</item>
+        <item>MALE</item>
+        <item>FEMALE</item>
     </string-array>
 </resources>

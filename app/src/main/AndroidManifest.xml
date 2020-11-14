@@ -16,12 +16,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".IntroScreen" />
-        <activity android:name=".LogoScreen" />
-        <activity android:name=".WavformActivity" />
+        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".LogoActivity" />
+        <activity android:name=".IntroActivity" />
+        <activity android:name=".bluetoothListActivity" />
         <activity android:name=".patientEntry" />
         <activity android:name=".nearestTowers" />
-        <activity android:name=".bluetoothListActivity">
+        <activity android:name=".RegisterActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

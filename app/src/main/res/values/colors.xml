@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorBlue">#3BB4E7</color>
-    <color name="colorOrange">#FF9B49</color>
-    <color name="colorGrey">#1a1a1a</color>
+    <color name="blue">#3BB4E7</color>
+    <color name="orange">#FF9B49</color>
+    <color name="grey">#1a1a1a</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00FF0000</color>
 </resources>

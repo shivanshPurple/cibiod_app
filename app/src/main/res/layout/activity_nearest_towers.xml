@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        app:cardBackgroundColor="@color/colorBlue"
+        app:cardBackgroundColor="@color/blue"
         app:cardCornerRadius="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/popupCard">
@@ -42,7 +42,7 @@
             android:id="@+id/locGetter"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
-            android:background="@color/colorBlue"
+            android:background="@color/blue"
             android:text="Set                       Location"
             android:textColor="#FFFFFF" />
     </androidx.cardview.widget.CardView>
@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
-        app:cardBackgroundColor="@color/colorBlue"
+        app:cardBackgroundColor="@color/blue"
         app:cardCornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/popupCard">
@@ -61,7 +61,7 @@
             android:id="@+id/getNearestPoints"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
-            android:background="@color/colorBlue"
+            android:background="@color/blue"
             android:text="Get nearest        points"
             android:textColor="#FFFFFF" />
     </androidx.cardview.widget.CardView>
@@ -70,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:cardBackgroundColor="@color/colorBlue"
+        app:cardBackgroundColor="@color/blue"
         app:cardCornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,7 +80,7 @@
             android:id="@+id/showCoverage"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
-            android:background="@color/colorBlue"
+            android:background="@color/blue"
             android:text="show Coverage"
             android:textColor="#FFFFFF" />
     </androidx.cardview.widget.CardView>
@@ -100,7 +100,7 @@
             android:id="@+id/markerProperties"
             android:layout_width="250dp"
             android:layout_height="500dp"
-            android:background="@color/colorBlue"
+            android:background="@color/blue"
             android:gravity="center"
             android:text="Properties"
             android:textAlignment="center"

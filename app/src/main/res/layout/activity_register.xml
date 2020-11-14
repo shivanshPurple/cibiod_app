@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/blue"
+    tools:context=".LoginActivity">
+
+    <Button
+        android:id="@+id/registerButtonFinal"
+        style="@style/ButtonTheme"
+        android:layout_marginBottom="80dp"
+        android:text="REGISTER"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/emailGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="200dp"
+        android:layout_marginEnd="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/emailRect"
+            android:layout_width="match_parent"
+            android:layout_height="29.5dp"
+            android:layout_alignTop="@+id/editEmail"
+            android:layout_alignParentStart="true"
+            android:scaleX="0"
+            app:srcCompat="@drawable/edittext_onselect_bg" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:backgroundTint="@color/white"
+            android:hint="E MAIL"
+            android:inputType="textEmailAddress" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/passwordGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailGroup">
+
+        <ImageView
+            android:id="@+id/passwordRect"
+            android:layout_width="match_parent"
+            android:layout_height="29.5dp"
+            android:layout_alignTop="@+id/editPassword"
+            android:layout_alignParentStart="true"
+            android:scaleX="0"
+            app:srcCompat="@drawable/edittext_onselect_bg" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:backgroundTint="@color/white"
+            android:hint="PASSWORD"
+            android:inputType="textPassword"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/confirmPasswordGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordGroup">
+
+        <ImageView
+            android:id="@+id/confirmPasswordRect"
+            android:layout_width="match_parent"
+            android:layout_height="29.5dp"
+            android:layout_alignTop="@+id/editConfirmPassword"
+            android:layout_alignParentStart="true"
+            android:scaleX="0"
+            app:srcCompat="@drawable/edittext_onselect_bg" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:backgroundTint="@color/white"
+            android:hint="CONFIRM PASSWORD"
+            android:inputType="textPassword"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/genderGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/confirmPasswordGroup">
+
+        <ImageView
+            android:id="@+id/genderPopupBg"
+            android:layout_width="match_parent"
+            android:layout_height="105dp"
+            android:layout_alignTop="@+id/genderSpinner"
+            android:layout_alignParentStart="true"
+            android:paddingBottom="105dp"
+            app:srcCompat="@drawable/dropdown_bg" />
+
+        <ImageView
+            android:id="@+id/genderDropdownArrow"
+            android:layout_width="12dp"
+            android:layout_height="8dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="11dp"
+            android:layout_marginEnd="11dp"
+            android:rotation="90"
+            app:srcCompat="@drawable/dropdown_arrow" />
+
+        <com.cibiod.app.CustomSpinner
+            android:id="@+id/genderSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:entries="@array/Gender"
+            android:popupBackground="@color/transparent"
+            android:theme="@style/SpinnerTheme" />
+
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

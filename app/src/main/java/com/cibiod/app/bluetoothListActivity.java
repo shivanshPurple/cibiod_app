@@ -1,5 +1,6 @@
 package com.cibiod.app;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,20 +11,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
 
-//import com.anand.brose.graphviewlibrary.GraphView;
-//import com.anand.brose.graphviewlibrary.WaveSample;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.Viewport;
@@ -38,12 +33,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,14 +43,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import be.tarsos.dsp.AudioDispatcher;
-import be.tarsos.dsp.GainProcessor;
-import be.tarsos.dsp.io.TarsosDSPAudioFormat;
-import be.tarsos.dsp.io.UniversalAudioInputStream;
-import be.tarsos.dsp.io.android.AndroidAudioPlayer;
-import be.tarsos.dsp.io.android.AndroidFFMPEGLocator;
-import be.tarsos.dsp.resample.RateTransposer;
-import be.tarsos.dsp.writer.WriterProcessor;
 
 public class bluetoothListActivity extends AppCompatActivity implements recyclerClickInterface{
     private BluetoothAdapter bluetoothAdapter;
@@ -71,10 +55,8 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
     private Thread receiveDataThread;
     private TextView connectionText, batteryText, temperatureText, hrText, dataLossText;
     private LineGraphSeries<DataPoint> pcgSeries, ecgSeries;
-    private int sampleRate = 4000, minBufferSize;
 
-    private String audio500path = Environment.getExternalStorageDirectory()+ "/cibiodLogs/songTest.wav",
-            audio4000path = Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio4000hz.wav",
+    private final String audio500path = Environment.getExternalStorageDirectory()+ "/cibiodLogs/songTest.wav",
             listPath = Environment.getExternalStorageDirectory()+ "/cibiodLogs/list1.txt";
 
     @Override
@@ -124,14 +106,14 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 
         initializeUiAndListener();
 
-        minBufferSize = AudioTrack.getMinBufferSize(sampleRate,
+        int minBufferSize = AudioTrack.getMinBufferSize(44100,
                 AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-        minBufferSize *= 2;
+        at = new AudioTrack(AudioManager.USE_DEFAULT_STREAM_TYPE, 44100,
+                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
+                minBufferSize, AudioTrack.MODE_STREAM);
 
-//        at = new AudioTrack(AudioManager.USE_DEFAULT_STREAM_TYPE, sampleRate,
-//                AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
-//                minBufferSize, AudioTrack.MODE_STREAM);
+        at.setPlaybackRate(500);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -147,56 +129,14 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 
         else
         {
-            requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 14);
             prefs = getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
             startBluetoothService();
-        }
-    }
-
-    private void playFile(String filePath, int position) {
-        try {
-            final MediaPlayer mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(filePath);
-            mediaPlayer.setAudioAttributes(
-                    new AudioAttributes.Builder()
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .build()
-            );
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-            if(position!=0)
-                mediaPlayer.seekTo(position);
-            Thread stateChangeListener = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    int prevPosition = 0;
-                    while(true)
-                    {
-                        if(!mediaPlayer.isPlaying())
-                        {
-                            mediaPlayer.reset();
-                            playFile(audio500path,prevPosition);
-                            break;
-                        }
-                        else
-                            prevPosition = mediaPlayer.getCurrentPosition();
-                    }
-                }
-            });
-
-            stateChangeListener.setPriority(Thread.NORM_PRIORITY);
-            stateChangeListener.start();
-        } catch (IOException e) {
-            e.printStackTrace();
+//            playAudio(new File(audio500path));
         }
     }
 
     private void startBluetoothService() {
 //            openServer();
-//            searchDevices();
-//            File f = new File(Environment.getExternalStorageDirectory()+ "/cibiodLogs/audio1.wav");
-//            playAudio(f);
 //            searchDevices();
 //            searchBondedDevices();
 
@@ -315,12 +255,10 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
     }
 
     private boolean getPcgSent = false;
-    private String lastUsed = "not used still";
 
     private void decodeDcip() {
         while(dataBuffer.length()>=12)
         {
-//            print("///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
             String data = dataBuffer.toString();
 
             if(data.startsWith("02C306"))
@@ -329,7 +267,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 {
                     if(checksumOk(data.substring(0,16),data.substring(16,18)))
                     {
-                        lastUsed=data;
                         wasPrevProcessed = true;
                         short pcg = (short) getDataFromHex(data.substring(6,10),0,4);
                         short ecg = (short) getDataFromHex(data.substring(10,14),0,4);
@@ -345,7 +282,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
             {
                 if(checksumOk(data.substring(0,10),data.substring(10,12)))
                 {
-                    lastUsed=data;
                     wasPrevProcessed = true;
                     int battery = getDataFromHex(data.substring(6,8),0,2);
                     int version = getDataFromHex(data.substring(8,10),0,2);
@@ -362,7 +298,6 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
             {
                 if(checksumOk(data.substring(0,10),data.substring(10,12)))
                 {
-                    lastUsed=data;
                     wasPrevProcessed = true;
                     int temperature = getDataFromHex(data.substring(6,10),0,4);
                     dataBuffer.delete(0,12);
@@ -382,7 +317,7 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
 
     private void plot(short pcg, short ecg) {
         pcgArr[j] = pcg;
-//        ecgArr[j] = ecg;
+        ecgArr[j] = ecg;
         j++;
 //        writeToFile(pcg);
         writeInWav(pcg);
@@ -396,15 +331,15 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
                 public void run() {
                     super.run();
                     print("plotting and playing started");
-                    playFile(audio500path, 0);
+                    playAudio(new File(audio500path));
                     while (true) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (pcgArr[i] != null) {
+                                if (pcgArr[i] != null)
                                     pcgSeries.appendData(new DataPoint(i * 2, pcgArr[i]), true, 7500);
-                                }
-//                                ecgSeries.appendData(new DataPoint(i*2,ecgArr[i]),true,7500);
+                                if (ecgArr[i] != null)
+                                    ecgSeries.appendData(new DataPoint(i*2,ecgArr[i]),true,7500);
                             }
                         });
                         i++;
@@ -800,23 +735,5 @@ public class bluetoothListActivity extends AppCompatActivity implements recycler
         connectionText.setText("Connected!");
 
         receiveData();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode==11)
-        {
-            if(resultCode==RESULT_CANCELED)
-            {
-                print("Bluetooth Required");
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, 11);
-            }
-            else if(resultCode==RESULT_OK) {
-                startBluetoothService();
-            }
-        }
     }
 }
