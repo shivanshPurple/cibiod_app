@@ -13,7 +13,8 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AnticipateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -67,7 +68,7 @@ public class LogoActivity extends AppCompatActivity implements GestureDetector.O
 
         orangeAnimator = ObjectAnimator.ofFloat(orangeBg,"translationY",screenDepth,0);
         orangeAnimator.setDuration(1000);
-        orangeAnimator.setInterpolator(new DecelerateInterpolator());
+        orangeAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         orangeAnimator.setCurrentPlayTime(0);
 
         orangeAnimator.addListener(new AnimatorListenerAdapter() {
@@ -118,12 +119,11 @@ public class LogoActivity extends AppCompatActivity implements GestureDetector.O
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         gestureDetectorCompat.onTouchEvent(event);
-        if(startPosition!=0 & okToSwipe)
+        if(startPosition!=0)
         {
             swipeAmount = startPosition - event.getY();
             swipeAmount = swipeAmount / maxSwipeDist;
             swipeAmount = Math.min(Math.max(0,swipeAmount),1);
-            orangeAnimator.setInterpolator(new AccelerateInterpolator());
             if(!animationStarted)
             {
                 if(swipeAmount>minSwipeAmt){
@@ -138,7 +138,7 @@ public class LogoActivity extends AppCompatActivity implements GestureDetector.O
         {
             ObjectAnimator tempRev = ObjectAnimator.ofFloat(orangeBg,"translationY",orangeBg.getY(),screenDepth);
             tempRev.setDuration(600);
-            tempRev.setInterpolator(new AccelerateInterpolator());
+            tempRev.setInterpolator(new AnticipateInterpolator());
             tempRev.start();
         }
         return super.onTouchEvent(event);

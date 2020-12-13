@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -56,6 +58,8 @@ public class IntroActivity extends AppCompatActivity implements GestureDetector.
         gestureDetectorCompat = new GestureDetectorCompat(this, this);
 
         bluetoothGroup = findViewById(R.id.bluetoothGroup);
+        Animation animFadein = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein2);
+        bluetoothGroup.startAnimation(animFadein);
         cloudGroup = findViewById(R.id.cloudGroup);
         inAppGroup = findViewById(R.id.inAppGroup);
 

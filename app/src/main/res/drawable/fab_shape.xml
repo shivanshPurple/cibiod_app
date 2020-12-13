@@ -1,0 +1,12 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:left="8dp" android:right="8dp" android:top="8dp" android:bottom="8dp">
+        <rotate android:fromDegrees="45">
+            <shape android:shape="rectangle">
+                <size android:width="48dp"
+                    android:height="48dp" />
+                <corners android:radius="5dp" />
+                <solid android:color="@color/orange"/>
+            </shape>
+        </rotate>
+    </item>
+</layer-list>

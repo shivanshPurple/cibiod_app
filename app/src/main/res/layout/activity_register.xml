@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/registerRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
@@ -14,6 +15,7 @@
         android:layout_marginBottom="80dp"
         android:text="REGISTER"
         android:textStyle="bold"
+        android:transitionName="sharedLoginRegisterButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -25,6 +27,7 @@
         android:layout_marginStart="64dp"
         android:layout_marginTop="200dp"
         android:layout_marginEnd="64dp"
+        android:transitionName="emailShared"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -43,9 +46,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_bg"
+            android:gravity="center"
             android:backgroundTint="@color/white"
             android:hint="E MAIL"
-            android:inputType="textEmailAddress" />
+            android:inputType="textVisiblePassword|textWebEmailAddress" />
 
     </RelativeLayout>
 
@@ -56,6 +60,7 @@
         android:layout_marginStart="64dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="64dp"
+        android:transitionName="passwordShared"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailGroup">
@@ -75,10 +80,9 @@
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_bg"
             android:backgroundTint="@color/white"
+            android:gravity="center"
             android:hint="PASSWORD"
-            android:inputType="textPassword"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:inputType="textPassword" />
 
     </RelativeLayout>
 
@@ -107,11 +111,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_bg"
+            android:gravity="center"
             android:backgroundTint="@color/white"
             android:hint="CONFIRM PASSWORD"
-            android:inputType="textPassword"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:inputType="textPassword" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -131,7 +134,8 @@
             android:layout_height="105dp"
             android:layout_alignTop="@+id/genderSpinner"
             android:layout_alignParentStart="true"
-            android:paddingBottom="105dp"
+            android:paddingBottom="0dp"
+            android:translationY="-105dp"
             app:srcCompat="@drawable/dropdown_bg" />
 
         <ImageView

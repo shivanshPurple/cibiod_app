@@ -8,11 +8,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -26,16 +27,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class patientEntry extends AppCompatActivity {
+public class patientEntry extends AppCompatActivity implements PatientRecyclerCallback{
     private DatabaseReference db;
-    private ArrayList<patientDetails> mPatients = new ArrayList<patientDetails>();
+    private ArrayList<PatientObject> mPatients = new ArrayList<PatientObject>();
     private RecyclerView rv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
-        getSupportActionBar().hide(); //hide the title bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient_entry);
 
@@ -55,7 +56,7 @@ public class patientEntry extends AppCompatActivity {
         button.setAlpha(0);
         button.setClickable(false);
 
-        rv = findViewById(R.id.recyclerView);
+        rv = findViewById(R.id.recyclerViewHome);
 
         displayRecent();
 
@@ -91,9 +92,8 @@ public class patientEntry extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren())
                 {
-                    patientDetails temp = new patientDetails(dataSnapshot.child("name").getValue().toString(),
+                    PatientObject temp = new PatientObject(dataSnapshot.child("name").getValue().toString(),
                             dataSnapshot.getKey(),
-                            dataSnapshot.child("address").getValue().toString(),
                             dataSnapshot.child("gender").getValue().toString(),
                             dataSnapshot.child("age").getValue().toString());
 
@@ -110,10 +110,10 @@ public class patientEntry extends AppCompatActivity {
         });
     }
 
-    private void changeAdapter(ArrayList<patientDetails> mPatients) {
+    private void changeAdapter(ArrayList<PatientObject> mPatients) {
         Collections.reverse(mPatients);
 
-        patientAdapter adapter = new patientAdapter(mPatients);
+        PatientAdapter adapter = new PatientAdapter(mPatients,this);
 
         rv.setAdapter(adapter);
 
@@ -129,12 +129,11 @@ public class patientEntry extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.hasChildren())
                 {
-                    ArrayList<patientDetails> filter = new ArrayList<patientDetails>();
+                    ArrayList<PatientObject> filter = new ArrayList<PatientObject>();
                     for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
 
-                        patientDetails temp = new patientDetails(postSnapshot.child("name").getValue().toString(),
+                        PatientObject temp = new PatientObject(postSnapshot.child("name").getValue().toString(),
                         postSnapshot.getKey(),
-                        postSnapshot.child("address").getValue().toString(),
                         postSnapshot.child("gender").getValue().toString(),
                         postSnapshot.child("age").getValue().toString());
 //
@@ -157,7 +156,7 @@ public class patientEntry extends AppCompatActivity {
 
     private void showButton(final String s)
     {
-        changeAdapter(new ArrayList<patientDetails>());
+        changeAdapter(new ArrayList<PatientObject>());
         Button button = findViewById(R.id.newPatientButton);
         String temp = "No results\n Add new patient with name " + s;
         button.setText(temp);
@@ -174,11 +173,16 @@ public class patientEntry extends AppCompatActivity {
 
     private void startActivity(String s)
     {
-        Intent intent = new Intent(this,forumActivity.class);
+        Intent intent = new Intent(this, oldForumActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("name",s);
         Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(this,android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
         startActivity(intent, bundle);
         finish();
+    }
+
+    @Override
+    public void OnPatientClickListener(int pos) {
+
     }
 }

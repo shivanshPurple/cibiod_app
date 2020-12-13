@@ -2,123 +2,157 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+    android:id="@+id/addRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="0dp"
-    android:paddingTop="0dp"
-    android:paddingRight="0dp"
-    android:paddingBottom="0dp"
-    tools:context=".forumActivity">
+    android:animateLayoutChanges="true"
+    android:background="@color/transparent"
+    tools:context=".LoginActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/buttonCard"
-        app:layout_constraintTop_toBottomOf="@+id/towerDetails2">
-
-        <EditText
-            android:id="@+id/newPatientName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="24dp"
-            android:layout_weight="1"
-            android:autofillHints="Serial No."
-            android:ems="10"
-            android:fontFamily="sans-serif-light"
-            android:hint="Name"
-            android:inputType="text" />
-
-        <EditText
-            android:id="@+id/newPatientAge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="24dp"
-            android:layout_weight="1"
-            android:autofillHints="@string/promptAzimuthAngle"
-            android:fontFamily="sans-serif-light"
-            android:hint="Age"
-            android:inputType="number"
-            android:selectAllOnFocus="true" />
-
-        <EditText
-            android:id="@+id/newPatientAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="24dp"
-            android:layout_weight="1"
-            android:autofillHints="@string/promptAddress"
-            android:ems="10"
-            android:fontFamily="sans-serif-light"
-            android:hint="Address"
-            android:inputType="text" />
-
-        <Spinner
-            android:id="@+id/newPatientGender"
-            style="@android:style/Widget.DeviceDefault.Spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="24dp"
-            android:layout_weight="1"
-            android:entries="@array/Gender"
-            android:spinnerMode="dropdown" />
-
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/circleButton2"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonCard"
-        app:layout_constraintEnd_toEndOf="@+id/buttonCard"
-        app:layout_constraintStart_toStartOf="@+id/buttonCard"
-        app:layout_constraintTop_toTopOf="@+id/buttonCard"
-        app:srcCompat="@drawable/circle" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/buttonCard"
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="5dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="false"
+    <Button
+        android:id="@+id/addButton"
+        style="@style/ButtonTheme"
+        android:layout_marginBottom="88dp"
+        android:text="ADD!"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/addTower"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/blue"
-            android:fontFamily="sans-serif-thin"
-            android:text="add location"
-            android:textAlignment="center"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
-    </androidx.cardview.widget.CardView>
-
-    <TextView
-        android:id="@+id/towerDetails2"
+    <ImageButton
+        android:id="@+id/addHomeButtonForum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="sans-serif-thin"
-        android:text="NEW PATIENT"
-        android:textSize="30sp"
+        android:layout_marginBottom="30dp"
+        android:background="@color/transparent"
+        android:src="@drawable/fab_shape"
+        android:transitionName="orangeBg"
+        android:stateListAnimator="@null"
+        android:scaleX="30"
+        android:scaleY="30"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/closeAddButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:transitionName="plusIcon"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:src="@drawable/plus_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/addNameGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="216dp"
+        android:layout_marginEnd="64dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/addNameRect"
+            android:layout_width="match_parent"
+            android:layout_height="29.5dp"
+            android:layout_alignTop="@+id/addNameEdit"
+            android:layout_alignParentStart="true"
+            android:scaleX="0"
+            app:srcCompat="@drawable/edittext_onselect_bg" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/addNameEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:gravity="center"
+            android:backgroundTint="@color/white"
+            android:hint="NAME"
+            android:inputType="textPersonName"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/addAgeGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addNameGroup">
+
+        <ImageView
+            android:id="@+id/addAgeRect"
+            android:layout_width="match_parent"
+            android:layout_height="29.5dp"
+            android:layout_alignTop="@+id/addAgeEdit"
+            android:layout_alignParentStart="true"
+            android:scaleX="0"
+            app:srcCompat="@drawable/edittext_onselect_bg" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/addAgeEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:backgroundTint="@color/white"
+            android:gravity="center"
+            android:hint="AGE"
+            android:inputType="number" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/addGenderGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addAgeGroup">
+
+        <ImageView
+            android:id="@+id/addGenderPopupBg"
+            android:layout_width="match_parent"
+            android:layout_height="105dp"
+            android:layout_alignTop="@+id/genderSpinner"
+            android:layout_alignParentStart="true"
+            android:paddingBottom="0dp"
+            android:translationY="-105dp"
+            app:srcCompat="@drawable/dropdown_bg" />
+
+        <ImageView
+            android:id="@+id/addGenderDropdownArrow"
+            android:layout_width="12dp"
+            android:layout_height="8dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="11dp"
+            android:layout_marginEnd="11dp"
+            android:rotation="90"
+            app:srcCompat="@drawable/dropdown_arrow" />
+
+        <com.cibiod.app.CustomSpinner
+            android:id="@+id/addGenderSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:entries="@array/Gender"
+            android:popupBackground="@color/transparent"
+            android:theme="@style/SpinnerTheme" />
+
+    </RelativeLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

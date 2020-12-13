@@ -1,24 +1,23 @@
 package com.cibiod.app;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class patientDetails {
+public class PatientObject implements Serializable {
     private String mName;
     private String mId;
-    private String mAddress;
     private String mGender;
     private String mAge;
 
-    public patientDetails(String name, String id, String address, String gender, String age)
+    public PatientObject(String name, String id, String gender, String age)
     {
         mName = name;
         mId = id;
-        mAddress = address;
         mGender = gender;
         mAge = age;
     }
 
-    public patientDetails getPatientDetails()
+    public PatientObject getPatientDetails()
     {
         return this;
     }
@@ -39,14 +38,6 @@ public class patientDetails {
         this.mId = mId;
     }
 
-    public String getAddress() {
-        return mAddress;
-    }
-
-    public void setAddress(String mAddress) {
-        this.mAddress = mAddress;
-    }
-
     public String getGender() {
         return mGender;
     }
@@ -63,11 +54,11 @@ public class patientDetails {
         this.mAge = mAge;
     }
 
-    public static ArrayList<patientDetails> createTemp(int amount) {
-        ArrayList<patientDetails> patients = new ArrayList<patientDetails>();
+    public static ArrayList<PatientObject> createTemp(int amount) {
+        ArrayList<PatientObject> patients = new ArrayList<PatientObject>();
 
         for (int i = 1; i <= amount; i++) {
-            patients.add(new patientDetails("Person " + amount, Integer.toString(amount), "address", "gender", "20"));
+            patients.add(new PatientObject("Person " + amount, Integer.toString(amount), "gender", "20"));
         }
 
         return patients;

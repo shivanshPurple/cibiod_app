@@ -2,8 +2,10 @@
 <resources>
     <color name="blue">#3BB4E7</color>
     <color name="orange">#FF9B49</color>
-    <color name="grey">#1a1a1a</color>
+    <color name="orangeDark">#C16F2B</color>
+    <color name="grey">#707070</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="transparent">#00FF0000</color>
+    <color name="transparent">#00000000</color>
+    <color name="scrim">#80000000</color>
 </resources>

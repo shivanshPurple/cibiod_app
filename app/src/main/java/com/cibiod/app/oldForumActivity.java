@@ -3,7 +3,6 @@ package com.cibiod.app;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.Animation;
@@ -35,7 +33,7 @@ import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
-public class forumActivity extends AppCompatActivity{
+public class oldForumActivity extends AppCompatActivity{
 
     private boolean ifPressed = false;
     private DatabaseReference dbRef;
@@ -46,7 +44,7 @@ public class forumActivity extends AppCompatActivity{
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_forum);
+        setContentView(R.layout.activity_forum_old);
 
         final EditText addressEditText = findViewById(R.id.newPatientAddress);
         final EditText nameEditText = findViewById(R.id.newPatientName);
@@ -141,10 +139,10 @@ public class forumActivity extends AppCompatActivity{
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(forumActivity.this, afterSubmissionActivity.class);
+                Intent intent = new Intent(oldForumActivity.this, afterSubmissionActivity.class);
                 intent.putExtra("data", d);
 
-                Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(forumActivity.this,android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
+                Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(oldForumActivity.this,android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
                 startActivity(intent, bundle);
             }
         };

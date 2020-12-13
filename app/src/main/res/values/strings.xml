@@ -12,4 +12,6 @@
         <item>MALE</item>
         <item>FEMALE</item>
     </string-array>
+    <string name="openNavDrawer">Open Navigation Drawer</string>
+    <string name="closeNavDrawer">Close Navigation Drawer</string>
 </resources>
