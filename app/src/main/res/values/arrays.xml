@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="rainbow">
+        <item>#E3B505</item>
+        <item>#9757EF</item>
+        <item>#F03A47</item>
+        <item>#3BB4E7</item>
+        <item>#FF9B49</item>
+    </array>
+    <!-- Reply Preference -->
+    <string-array name="reply_entries">
+        <item>Reply</item>
+        <item>Reply to all</item>
+    </string-array>
+
+    <string-array name="reply_values">
+        <item>reply</item>
+        <item>reply_all</item>
+    </string-array>
+</resources>

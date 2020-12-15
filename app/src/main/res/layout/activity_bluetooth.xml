@@ -5,33 +5,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawerLayoutPatient"
     android:layout_width="match_parent"
-    android:background="@drawable/screen_bg_without_collapsingtoolbar"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen_without_collapsingtoolbar">
 
     <View
         android:id="@+id/scrim"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent"
-        android:elevation="10dp"/>
+        android:elevation="10dp" />
 
     <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navViewPatient"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        app:menu="@menu/nav_menu"
-        android:id="@+id/navViewPatient"
         android:layout_gravity="start"
-        android:foregroundGravity="bottom"
+        android:background="@drawable/bg_nav"
         android:fitsSystemWindows="false"
+        android:foregroundGravity="bottom"
         app:headerLayout="@layout/nav_header"
-        android:background="@drawable/nav_bg"
+        app:itemIconTint="@color/grey"
         app:itemTextColor="@color/grey"
-        app:itemIconTint="@color/grey"/>
+        app:menu="@menu/nav_menu" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".BluetoothActivity">
+        tools:context=".Activities.BluetoothActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarTest"
@@ -86,7 +86,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="20dp"
-                android:src="@drawable/bottom_bar"
+                android:src="@drawable/bg_bottom_bar"
                 android:stateListAnimator="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -112,7 +112,7 @@
                 android:layout_marginBottom="50dp"
                 android:scaleX="1.2"
                 android:scaleY="1.2"
-                android:src="@drawable/cloud_icon"
+                android:src="@drawable/icon_cloud"
                 android:transitionName="plusIcon"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -132,7 +132,7 @@
                 android:id="@+id/imageView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/test_textview_bg"
+                android:src="@drawable/bg_test_textview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -173,7 +173,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/test_textview_bg"
+                android:src="@drawable/bg_test_textview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -216,7 +216,7 @@
                 android:id="@+id/imageView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/test_textview_bg"
+                android:src="@drawable/bg_test_textview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -257,7 +257,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/test_textview_bg"
+                android:src="@drawable/bg_test_textview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -298,8 +298,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/graphViewEcg" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>

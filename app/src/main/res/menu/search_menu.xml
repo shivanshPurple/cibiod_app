@@ -4,7 +4,7 @@
 
     <item android:title="Search Patients"
         android:id="@+id/searchView"
-        android:icon="@drawable/patient_search_icon"
+        android:icon="@drawable/icon_patient_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView"/>
 </menu>

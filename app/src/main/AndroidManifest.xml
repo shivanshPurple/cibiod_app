@@ -10,47 +10,28 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:icon="@drawable/logo"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/vector_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/FullScreenTheme"
+        android:theme="@style/DefaultTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".BluetoothActivity" android:hardwareAccelerated="true"/>
-        <activity android:name=".ForumActivity" />
-        <activity android:name=".PatientActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".IntroActivity" />
-        <activity android:name=".LogoActivity" />
-        <activity android:name=".patientEntry" />
-        <activity android:name=".nearestTowers" />
-        <activity android:name=".HomeActivity" >
+        <activity android:name=".Activities.IntroActivity" />
+        <activity android:name=".Activities.BluetoothActivity" />
+        <activity android:name=".Activities.ForumActivity" />
+        <activity android:name=".Activities.PatientActivity" />
+        <activity android:name=".Activities.LogoActivity" />
+        <activity android:name=".Activities.LoginActivity" />
+        <activity android:name=".Activities.RegisterActivity" />
+        <activity android:name=".Activities.HomeActivity" />
+        <activity android:name=".Activities.SettingsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".afterSubmissionActivity"
-            android:finishOnTaskLaunch="true"
-            android:noHistory="true"
-            android:parentActivityName=".oldForumActivity" />
-        <activity
-            android:name=".oldForumActivity"
-            android:finishOnTaskLaunch="true"
-            android:noHistory="true" />
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAz2Acg9MbV8AwgeoAkSrnaG1_8psYY054" />
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

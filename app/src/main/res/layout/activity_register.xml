@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:background="@color/blue"
-    tools:context=".LoginActivity">
+    tools:context=".Activities.LoginActivity">
 
     <Button
         android:id="@+id/registerButtonFinal"
@@ -39,13 +39,13 @@
             android:layout_alignTop="@+id/editEmail"
             android:layout_alignParentStart="true"
             android:scaleX="0"
-            app:srcCompat="@drawable/edittext_onselect_bg" />
+            app:srcCompat="@drawable/bg_edittext_onselect" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/edittext_bg"
+            android:background="@drawable/bg_edittext"
             android:gravity="center"
             android:backgroundTint="@color/white"
             android:hint="E MAIL"
@@ -72,13 +72,13 @@
             android:layout_alignTop="@+id/editPassword"
             android:layout_alignParentStart="true"
             android:scaleX="0"
-            app:srcCompat="@drawable/edittext_onselect_bg" />
+            app:srcCompat="@drawable/bg_edittext_onselect" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/edittext_bg"
+            android:background="@drawable/bg_edittext"
             android:backgroundTint="@color/white"
             android:gravity="center"
             android:hint="PASSWORD"
@@ -104,13 +104,13 @@
             android:layout_alignTop="@+id/editConfirmPassword"
             android:layout_alignParentStart="true"
             android:scaleX="0"
-            app:srcCompat="@drawable/edittext_onselect_bg" />
+            app:srcCompat="@drawable/bg_edittext_onselect" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editConfirmPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/edittext_bg"
+            android:background="@drawable/bg_edittext"
             android:gravity="center"
             android:backgroundTint="@color/white"
             android:hint="CONFIRM PASSWORD"
@@ -132,11 +132,8 @@
             android:id="@+id/genderPopupBg"
             android:layout_width="match_parent"
             android:layout_height="105dp"
-            android:layout_alignTop="@+id/genderSpinner"
-            android:layout_alignParentStart="true"
-            android:paddingBottom="0dp"
             android:translationY="-105dp"
-            app:srcCompat="@drawable/dropdown_bg" />
+            app:srcCompat="@drawable/bg_dropdown" />
 
         <ImageView
             android:id="@+id/genderDropdownArrow"
@@ -146,14 +143,15 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="11dp"
             android:layout_marginEnd="11dp"
-            android:rotation="90"
-            app:srcCompat="@drawable/dropdown_arrow" />
+            android:scaleX="3"
+            android:scaleY="3"
+            app:srcCompat="@drawable/icon_dropdown" />
 
-        <com.cibiod.app.CustomSpinner
+        <com.cibiod.app.CustomViews.CustomSpinner
             android:id="@+id/genderSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/edittext_bg"
+            android:background="@drawable/bg_edittext"
             android:entries="@array/Gender"
             android:popupBackground="@color/transparent"
             android:theme="@style/SpinnerTheme" />

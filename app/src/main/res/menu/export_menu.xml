@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/exportButton"
-        android:icon="@drawable/share_icon"
+        android:icon="@drawable/icon_share"
         app:showAsAction="always"
         android:title="Share">
 

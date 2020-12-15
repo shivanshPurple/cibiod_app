@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/orange"
-    tools:context=".IntroActivity" >
+    tools:context=".Activities.IntroActivity" >
 
     <ImageView
         android:id="@+id/circle1white"
@@ -17,7 +17,7 @@
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/circle2white"
-        app:srcCompat="@drawable/circle" />
+        app:srcCompat="@drawable/icon_circle" />
 
     <ImageView
         android:id="@+id/circle1black"
@@ -30,7 +30,7 @@
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/circle2white"
-        app:srcCompat="@drawable/circle"
+        app:srcCompat="@drawable/icon_circle"
         app:tint="@color/black" />
 
     <ImageView
@@ -43,7 +43,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/circle" />
+        app:srcCompat="@drawable/icon_circle" />
 
     <ImageView
         android:id="@+id/circle2black"
@@ -56,7 +56,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/circle"
+        app:srcCompat="@drawable/icon_circle"
         app:tint="@color/black" />
 
     <ImageView
@@ -69,7 +69,7 @@
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/circle2white"
-        app:srcCompat="@drawable/circle" />
+        app:srcCompat="@drawable/icon_circle" />
 
     <ImageView
         android:id="@+id/circle3black"
@@ -82,7 +82,7 @@
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/circle2white"
-        app:srcCompat="@drawable/circle"
+        app:srcCompat="@drawable/icon_circle"
         app:tint="@color/black" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -119,6 +119,7 @@
             android:layout_marginEnd="32dp"
             android:fontFamily="sans-serif-light"
             android:text="Use our device to reduce  the hassle of  wires or getting in contact with someone.  Your phone will connect automatically to the  device while you are examining someone.  No need to worry about pairing and  connecting to the device."
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
@@ -155,6 +156,7 @@
             android:fontFamily="@font/roboto_black"
             android:letterSpacing="0.05"
             android:text="CLOUD \nSTORAGE"
+            android:textColor="@color/white"
             android:textSize="33sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -169,6 +171,7 @@
             android:layout_marginEnd="32dp"
             android:fontFamily="sans-serif-light"
             android:text="Every test you take will automatically save itself on our cloud services , so you can manage them for later. These tests may also be used to train algorithms which can help you get more out of every analysis."
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
@@ -204,6 +207,7 @@
             android:fontFamily="@font/roboto_black"
             android:letterSpacing="0.05"
             android:text="IN APP \nPROCESSING"
+            android:textColor="@color/white"
             android:textSize="33sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -218,6 +222,7 @@
             android:layout_marginEnd="32dp"
             android:fontFamily="sans-serif-light"
             android:text="Our app provides in-app processing features like filtering to pick up heart or lung sounds individually. It can also export every PCG file as a WAV file for sharing purposes."
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"

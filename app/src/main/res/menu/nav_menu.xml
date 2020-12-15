@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:icon="@drawable/home_icon"
+        android:icon="@drawable/icon_home"
         android:title="Home" />
 
     <item
-        android:icon="@drawable/quick_test_icon"
+        android:icon="@drawable/icon_quick_test"
         android:title="Quick Test" />
 
     <item
-        android:icon="@drawable/setting_icon"
+        android:icon="@drawable/icon_setting"
         android:title="Settings" />
 
     <item
-        android:icon="@drawable/logout_icon"
+        android:icon="@drawable/icon_logout"
         android:title="Logout" />
 
 </menu>
