@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.transition.Fade;
 import android.util.Log;
@@ -21,6 +22,9 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.cibiod.app.Activities.BluetoothActivity;
+import com.cibiod.app.Activities.HomeActivity;
+import com.cibiod.app.Activities.SettingsActivity;
 import com.cibiod.app.CustomViews.CustomSpinner;
 import com.cibiod.app.R;
 import com.google.android.material.navigation.NavigationView;
@@ -29,6 +33,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
@@ -43,6 +48,7 @@ public class u {
     }
 
     public static void setupEditText(final Context context, final EditText editText, final ImageView editRect, final String hint, final boolean isLast) {
+        editRect.setTranslationY(-5);
         editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -152,7 +158,7 @@ public class u {
         window.setExitTransition(fade);
     }
 
-    public static void setupToolbar(Activity activity, DrawerLayout drawerLayout, NavigationView navigationView, Toolbar toolbar, String string, int padding) {
+    public static void setupToolbar(final Activity activity, final DrawerLayout drawerLayout, NavigationView navigationView, Toolbar toolbar, String string, int padding) {
         TextView textView = activity.findViewById(R.id.toolbarTitle);
         textView.setText(string);
         textView.setPadding(0, 0, padding, 0);
@@ -163,6 +169,21 @@ public class u {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.menuHome:
+                        if (!activity.getLocalClassName().equals("Activities.HomeActivity"))
+                            activity.startActivity(new Intent(activity, HomeActivity.class));
+                        break;
+                    case R.id.menuQuickTest:
+                        if (!activity.getLocalClassName().equals("Activities.BluetoothActivity"))
+                            activity.startActivity(new Intent(activity, BluetoothActivity.class).putExtra("from", "quickTest"));
+                        break;
+                    case R.id.menuSettings:
+                        if (!activity.getLocalClassName().equals("Activities.SettingsActivity"))
+                            activity.startActivity(new Intent(activity, SettingsActivity.class));
+                        break;
+                }
+                drawerLayout.closeDrawer(GravityCompat.START);
                 return false;
             }
         });

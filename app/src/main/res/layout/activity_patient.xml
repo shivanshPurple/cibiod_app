@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayoutPatient"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawerLayoutPatient">
+    android:background="@color/transparent"
+    android:transitionName="patientContainer">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/homeLayout"
@@ -24,21 +26,19 @@
                 android:id="@+id/collapsingToolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/blue"
                 app:contentScrim="@color/blue"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
                 app:scrimVisibleHeightTrigger="200dp">
 
                 <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/patientActivityImg"
+                    android:layout_width="128dp"
+                    android:layout_height="128dp"
                     android:layout_gravity="center_horizontal"
-                    android:elevation="11dp"
-                    android:translationZ="11dp"
                     android:layout_marginTop="118dp"
-                    app:srcCompat="@drawable/bg_patient_circle"
-                    app:layout_collapseMode="parallax" />
+                    android:transitionName="patientSharedImg"
+                    app:layout_collapseMode="parallax"
+                    app:srcCompat="@drawable/vector_patient_male" />
 
                 <TextView
                     android:id="@+id/patientName"
@@ -47,8 +47,8 @@
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="285dp"
                     android:text="Name"
-                    android:textSize="18sp"
                     android:textColor="@color/white"
+                    android:textSize="18sp"
                     app:layout_collapseMode="parallax" />
 
                 <TextView
@@ -58,8 +58,8 @@
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="310dp"
                     android:text="#123"
-                    android:textSize="12sp"
                     android:textColor="@color/white"
+                    android:textSize="12sp"
                     app:layout_collapseMode="parallax" />
 
                 <TextView
@@ -70,8 +70,8 @@
                     android:layout_marginTop="285dp"
                     android:layout_marginEnd="32dp"
                     android:text="MALE"
-                    android:textSize="18sp"
                     android:textColor="@color/white"
+                    android:textSize="18sp"
                     app:layout_collapseMode="parallax" />
 
                 <TextView
@@ -82,8 +82,8 @@
                     android:layout_marginTop="310dp"
                     android:layout_marginEnd="32dp"
                     android:text="21"
-                    android:textSize="12sp"
                     android:textColor="@color/white"
+                    android:textSize="12sp"
                     app:layout_collapseMode="parallax" />
 
                 <TextView
@@ -92,7 +92,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="365dp"
                     android:layout_marginBottom="8dp"
-                    android:text="Recent Patients"
+                    android:text="Recent Tests"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     app:layout_collapseMode="parallax" />
@@ -101,82 +101,57 @@
                     android:id="@+id/toolbarPatient"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_collapseMode="pin"/>
+                    android:background="@color/blue"
+                    android:elevation="4dp"
+                    app:layout_collapseMode="pin" />
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/patientBottomBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:transitionName="patientBottomBar"
-            android:elevation="20dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:elevation="20dp"
-                android:src="@drawable/bg_bottom_bar"
-                android:stateListAnimator="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <ImageButton
-                android:id="@+id/newTestButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:background="@color/transparent"
-                android:onClick="startNewTest"
-                android:src="@drawable/fab_shape"
-                android:stateListAnimator="@null"
-                android:transitionName="orangeBg"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/newTestIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:transitionName="plusIcon"
-                android:layout_marginBottom="50dp"
-                android:scaleX="1.5"
-                android:scaleY="1.5"
-                android:src="@drawable/icon_plus"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewHome"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_rounded_white"
             android:clipToPadding="false"
-            android:elevation="10dp"
-            android:paddingTop="16dp"
-            android:transitionName="dataRecyclerView"
-            android:paddingBottom="?attr/actionBarSize"
+            android:overScrollMode="never"
+            android:paddingTop="8dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabPatient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/fab_shape"
+            android:onClick="startNewTest"
+            android:rotation="45"
+            android:src="@drawable/icon_plus_45"
+            app:layout_anchor="@id/bottomBarPatient"
+            app:maxImageSize="32dp"
+            app:shapeAppearanceOverlay="@style/FabDiamondOverlay" />
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottomBarPatient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:backgroundTint="@color/blue"
+            app:fabCradleMargin="24dp"
+            app:fabCradleVerticalOffset="8dp"
+            app:hideOnScroll="true" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navViewPatient"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        app:menu="@menu/nav_menu"
-        android:id="@+id/navViewPatient"
         android:layout_gravity="start"
-        android:foregroundGravity="bottom"
-        android:fitsSystemWindows="false"
-        app:headerLayout="@layout/nav_header"
         android:background="@drawable/bg_nav"
+        android:fitsSystemWindows="false"
+        android:foregroundGravity="bottom"
+        app:headerLayout="@layout/nav_header"
+        app:itemIconTint="@color/grey"
         app:itemTextColor="@color/grey"
-        app:itemIconTint="@color/grey"/>
+        app:menu="@menu/nav_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

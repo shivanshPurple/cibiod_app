@@ -8,20 +8,33 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_screen_without_collapsingtoolbar">
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navViewSettings"
-        android:layout_width="300dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@drawable/bg_nav"
-        android:fitsSystemWindows="false"
-        android:foregroundGravity="bottom"
-        app:headerLayout="@layout/nav_header"
-        app:itemIconTint="@color/grey"
-        app:itemTextColor="@color/grey"
-        app:menu="@menu/nav_menu" />
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:rotation="45"
+            android:src="@drawable/icon_tick"
+            app:layout_anchor="@id/bottomBarSettings"
+            app:maxImageSize="32dp"
+            app:shapeAppearanceOverlay="@style/FabDiamondOverlay" />
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottomBarSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:backgroundTint="@color/blue"
+            app:fabCradleMargin="24dp"
+            app:fabCradleVerticalOffset="8dp"
+            app:hideOnScroll="true" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".Activities.BluetoothActivity">
@@ -33,42 +46,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="20dp"
-            android:src="@drawable/bg_bottom_bar"
-            android:stateListAnimator="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <ImageButton
-            android:id="@+id/saveSettingsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:background="@color/transparent"
-            android:src="@drawable/fab_shape"
-            android:stateListAnimator="@null"
-            android:transitionName="orangeBg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/saveSettingsIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
-            android:scaleX="1.2"
-            android:scaleY="1.2"
-            android:src="@drawable/icon_tick"
-            android:transitionName="plusIcon"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/textView2"
@@ -86,18 +63,17 @@
             style="@style/Material.Widget.Slider.Discrete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
-            app:sl_alwaysFillThumb="false"
-            app:sl_interpolator="@android:interpolator/overshoot"
+            app:sl_interpolator="@android:anim/overshoot_interpolator"
             app:sl_maxValue="100"
             app:sl_minValue="0"
-            app:sl_secondaryColor="@color/blue"
-            app:sl_stepValue="10" />
+            app:sl_primaryColor="@color/blue"
+            app:sl_secondaryColor="@color/grey" />
 
         <View
             android:id="@+id/view2"
@@ -183,23 +159,53 @@
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/cibiodLink"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:text="CIBIOD"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:layout_height="wrap_content">
 
-                <TextView
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:text="@string/publisherName"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:scaleX="0.8"
+                        android:scaleY="0.8"
+                        android:src="@drawable/icon_open_url"
+                        app:tint="@color/black" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/purpleLink"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:text="Purple"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:text="@string/devName"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:scaleX="0.8"
+                        android:scaleY="0.8"
+                        android:src="@drawable/icon_open_url"
+                        app:tint="@color/black" />
+
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
@@ -217,19 +223,34 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/logoutButton"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Logout"
-            android:textColor="@color/black"
             android:drawableBottom="@drawable/icon_logout"
             android:drawableTint="@color/black"
+            android:padding="16dp"
+            android:text="Logout"
             android:textAllCaps="false"
-            android:background="@null"
+            android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view3"/>
+            app:layout_constraintTop_toBottomOf="@+id/view3" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navViewSettings"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@drawable/bg_nav"
+        android:fitsSystemWindows="false"
+        android:foregroundGravity="bottom"
+        app:headerLayout="@layout/nav_header"
+        app:itemIconTint="@color/grey"
+        app:itemTextColor="@color/grey"
+        app:menu="@menu/nav_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

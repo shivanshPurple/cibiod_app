@@ -4,32 +4,42 @@ import android.animation.ObjectAnimator;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cibiod.app.Fragments.BottomSheetBluetoothDevice;
 import com.cibiod.app.Objects.PatientObject;
-import com.cibiod.app.R;
 import com.cibiod.app.Objects.TestObject;
+import com.cibiod.app.R;
+import com.cibiod.app.Utils.BottomAppBarCutCornersTopEdge;
 import com.cibiod.app.Utils.Wavfile;
 import com.cibiod.app.Utils.u;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.bottomappbar.BottomAppBarTopEdgeTreatment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.shape.CornerFamily;
+import com.google.android.material.shape.MaterialShapeDrawable;
+import com.google.android.material.transition.platform.MaterialContainerTransform;
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -84,8 +94,6 @@ public class BluetoothActivity extends AppCompatActivity {
 
     private FileOutputStream pcgOs, ecgOs, tempOs;
 
-    private BottomSheetBluetoothDevice bottomSheet;
-
     //   These values are used for plotting
     private int i = 0, j = 0;
     private Queue<Short> pcgQ, ecgQ;
@@ -100,7 +108,7 @@ public class BluetoothActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.cutom_toolbar);
 
-        DrawerLayout drawerLayout = findViewById(R.id.drawerLayoutPatient);
+        DrawerLayout drawerLayout = findViewById(R.id.drawerLayoutTest);
         NavigationView navigationView = findViewById(R.id.navViewPatient);
         u.setupToolbar(this, drawerLayout, navigationView, toolbar, "Test", 100);
 
@@ -153,6 +161,7 @@ public class BluetoothActivity extends AppCompatActivity {
         hrText = findViewById(R.id.heartrate);
         batteryText = findViewById(R.id.batteryLvl);
         dataLossText = findViewById(R.id.dataLoss);
+        FloatingActionButton fab = findViewById(R.id.fabTest);
 
         try {
             pcgOs = new FileOutputStream(pcgFile);
@@ -161,27 +170,47 @@ public class BluetoothActivity extends AppCompatActivity {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+
+        BottomAppBar bar = findViewById(R.id.bottomBarTest);
+
+        BottomAppBarTopEdgeTreatment topEdge = new BottomAppBarCutCornersTopEdge(
+                bar.getFabCradleMargin(),
+                bar.getFabCradleRoundedCornerRadius(),
+                bar.getCradleVerticalOffset());
+
+        MaterialShapeDrawable bottomBarBackground = (MaterialShapeDrawable) bar.getBackground();
+        bottomBarBackground.setShapeAppearanceModel(
+                bottomBarBackground.getShapeAppearanceModel()
+                        .toBuilder()
+                        .setTopRightCorner(CornerFamily.ROUNDED, 75)
+                        .setTopLeftCorner(CornerFamily.ROUNDED, 75)
+                        .setTopEdge(topEdge)
+                        .build());
         //endregion
 
         Intent intent = getIntent();
         String action = intent.getStringExtra("from");
 
         if (action != null && action.equals("cloud")) {
+            setEnterSharedElementCallback(new MaterialContainerTransformSharedElementCallback());
+            getWindow().setSharedElementEnterTransition(customTransition());
+            getWindow().setSharedElementReturnTransition(customTransition());
             TestObject test = (TestObject) getIntent().getSerializableExtra("testObject");
             downloadFromCloud(test);
             statusText.setText("DOWNLOADING FROM CLOUD");
-            ShapeableImageView bottomButtonIcon = findViewById(R.id.uploadTestIcon);
-            bottomButtonIcon.setImageResource(R.drawable.icon_tick);
-            return;
-        }
+            fab.setImageResource(R.drawable.icon_tick);
+        } else if (action != null) {
+            if (action.equals("local")) {
+                patient = (PatientObject) getIntent().getSerializableExtra("patientObject");
+                fab.setOnClickListener(new UploadClickListener());
+            } else if (action.equals("quickTest")) {
+                fab.setImageResource(R.drawable.icon_tick);
+            }
 
-        if (action != null && action.equals("local")) {
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            ImageButton uploadButton = findViewById(R.id.uploadTestButton);
-            patient = (PatientObject) getIntent().getSerializableExtra("patientObject");
-            uploadButton.setOnClickListener(new UploadClickListener());
             if (bluetoothAdapter == null) {
-                u.print("Bluetooth Required");
+                Toast.makeText(this, "Bluetooth Required", Toast.LENGTH_LONG).show();
                 finish();
             } else if (!bluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -191,6 +220,17 @@ public class BluetoothActivity extends AppCompatActivity {
                 startBluetoothService();
             }
         }
+    }
+
+    private Transition customTransition() {
+        MaterialContainerTransform mct = new MaterialContainerTransform();
+        mct.setFadeMode(MaterialContainerTransform.FADE_MODE_OUT);
+        mct.setScrimColor(Color.DKGRAY);
+        mct.setAllContainerColors(Color.WHITE);
+        mct.setElevationShadowEnabled(true);
+        mct.setStartElevation(8);
+        mct.setEndElevation(16);
+        return mct.addTarget(R.id.drawerLayoutTest).setDuration(600).setInterpolator(new AccelerateDecelerateInterpolator());
     }
 
     //region Top right corner menu setup
@@ -372,18 +412,19 @@ public class BluetoothActivity extends AppCompatActivity {
         }
     }
 
-    private void startBluetoothService() {
+    public void startBluetoothService() {
         SharedPreferences prefs = getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
         String deviceAddress = prefs.getString("pairedStethoAddress", "NA");
         if (deviceAddress.equals("NA")) {
-            bottomSheet = new BottomSheetBluetoothDevice(bluetoothAdapter);
-            bottomSheet.show(getSupportFragmentManager(),"bottomSheet");
+//            BottomSheetBluetoothDevice bottomSheet = new BottomSheetBluetoothDevice(bluetoothAdapter);
+//            bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
+            searchDevices();
             return;
         }
 
 
         try {
-            BluetoothDevice toConnectBtDevice = bluetoothAdapter.getRemoteDevice("00:01:95:4A:46:7A");
+            BluetoothDevice toConnectBtDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
             BluetoothSocket btSocket;
             btSocket = toConnectBtDevice.createRfcommSocketToServiceRecord(uuid);
             btSocket.connect();
@@ -406,7 +447,12 @@ public class BluetoothActivity extends AppCompatActivity {
                 InputStream inStream;
                 try {
                     inStream = connectedSocket.getInputStream();
-                    statusText.setText("BUFFERING DATA");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            statusText.setText("BUFFERING DATA");
+                        }
+                    });
                     byte[] inData = new byte[1024];
                     int read;
                     while (!this.isInterrupted()) {
@@ -613,8 +659,7 @@ public class BluetoothActivity extends AppCompatActivity {
         at.stop();
         at.flush();
         at.release();
-        if(pcgQ!=null)
-        {
+        if (pcgQ != null) {
             pcgQ.clear();
             ecgQ.clear();
         }
@@ -707,6 +752,23 @@ public class BluetoothActivity extends AppCompatActivity {
 
         }
     }
+
+    private void searchDevices() {
+        u.print("searching");
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(receiver, filter);
+        bluetoothAdapter.startDiscovery();
+    }
+
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                u.print(device.getName());
+            }
+        }
+    };
     //    private boolean ifEqDone = false;
 
 //    private void dsp(FileInputStream inputStream) throws FileNotFoundException{

@@ -9,7 +9,7 @@
         <item name="android:textSize">20sp</item>
         <item name="android:gravity">center</item>
         <item name="android:letterSpacing">0</item>
-        <item name="android:fontFamily">sans-serif-thin</item>
+        <item name="android:fontFamily">@font/raleway_bold</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColorHint">@color/white</item>
         <item name="cornerRadius">10dp</item>
@@ -20,6 +20,7 @@
         <item name="searchViewStyle">@style/CustomSearchView</item>
         <item name="toolbarStyle">@style/CustomToolbar</item>
         <item name="android:itemTextAppearance">@style/CustomMenuItem</item>
+        <item name="android:windowActivityTransitions">true</item>
     </style>
 
     <style name="ButtonTheme" parent="DefaultTheme">
@@ -73,4 +74,10 @@
         <item name="lpd_strokeColors">@array/rainbow</item>
         <item name="lpd_strokeSecondaryColor">@color/transparent</item>
     </style>
+
+    <style name="FabDiamondOverlay" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">15%</item>
+    </style>
+
 </resources>

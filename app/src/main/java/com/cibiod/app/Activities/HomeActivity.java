@@ -1,35 +1,35 @@
 package com.cibiod.app.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.TransitionManager;
-
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.transition.ChangeBounds;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cibiod.app.Adapters.PatientAdapter;
+import com.cibiod.app.Callbacks.RecyclerCallback;
 import com.cibiod.app.Objects.PatientObject;
 import com.cibiod.app.R;
-import com.cibiod.app.Callbacks.RecyclerCallback;
+import com.cibiod.app.Utils.BottomAppBarCutCornersTopEdge;
 import com.cibiod.app.Utils.u;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.bottomappbar.BottomAppBarTopEdgeTreatment;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.shape.CornerFamily;
+import com.google.android.material.shape.MaterialShapeDrawable;
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,11 +39,23 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Objects;
+import java.util.Iterator;
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class HomeActivity extends AppCompatActivity implements RecyclerCallback {
     private DatabaseReference db;
     private ArrayList<PatientObject> mPatients = new ArrayList<>();
+    private PatientAdapter recyclerAdapter;
 
     private RecyclerView rv;
     private AppBarLayout appBarLayout;
@@ -51,6 +63,8 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setExitSharedElementCallback(new MaterialContainerTransformSharedElementCallback());
+        getWindow().setSharedElementsUseOverlay(false);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         u.sharedTransFix(getWindow(), R.color.blue);
@@ -62,22 +76,34 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
         appBarLayout = findViewById(R.id.appBarLayout);
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayoutHome);
         NavigationView navigationView = findViewById((R.id.navViewHome));
-
         u.setupToolbar(this, drawerLayout, navigationView, toolbar, "Home", 55);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         db = database.getReference("users");
 
+        BottomAppBar bar = findViewById(R.id.bottomBarHome);
+
+        BottomAppBarTopEdgeTreatment topEdge = new BottomAppBarCutCornersTopEdge(
+                bar.getFabCradleMargin(),
+                bar.getFabCradleRoundedCornerRadius(),
+                bar.getCradleVerticalOffset());
+
+        MaterialShapeDrawable bottomBarBackground = (MaterialShapeDrawable) bar.getBackground();
+        bottomBarBackground.setShapeAppearanceModel(
+                bottomBarBackground.getShapeAppearanceModel()
+                        .toBuilder()
+                        .setTopRightCorner(CornerFamily.ROUNDED, 75)
+                        .setTopLeftCorner(CornerFamily.ROUNDED, 75)
+                        .setTopEdge(topEdge)
+                        .build());
+
         rv = findViewById(R.id.recyclerViewHome);
 
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        recyclerAdapter = new PatientAdapter(this, mPatients, this);
+        rv.setAdapter(recyclerAdapter);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+
         displayRecent();
-
-
     }
 
     SearchView searchView;
@@ -111,10 +137,8 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
                 appBarLayout.setExpanded(false);
                 if (!newText.equals(""))
                     searchDB(newText);
-                else {
-                    Collections.reverse(mPatients);
-                    changeAdapter(mPatients);
-                }
+                else
+                    displayRecent();
                 return true;
             }
         });
@@ -154,6 +178,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
         search.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                recyclerAdapter.notifyItemRangeRemoved(0, mPatients.size());
                 mPatients.clear();
                 if (dataSnapshot.hasChildren()) {
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
@@ -161,12 +186,11 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
                                 postSnapshot.getKey(),
                                 postSnapshot.child("gender").getValue().toString(),
                                 postSnapshot.child("age").getValue().toString());
-                        mPatients.add(temp);
+                        updateAdapter(temp);
                     }
                 } else {
                     mPatients.clear();
                 }
-                changeAdapter(mPatients);
                 db.removeEventListener(this);
             }
 
@@ -178,20 +202,32 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
     }
 
     private void displayRecent() {
-        Query lastEntries = db.child("q@w").child("patients").limitToLast(10);
-
+        Query lastEntries = db.child("q@w").child("patients").limitToLast(25);
         lastEntries.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                recyclerAdapter.notifyItemRangeRemoved(0, mPatients.size());
                 mPatients.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    PatientObject temp = new PatientObject(Objects.requireNonNull(dataSnapshot.child("name").getValue()).toString(),
-                            dataSnapshot.getKey(),
-                            Objects.requireNonNull(dataSnapshot.child("gender").getValue()).toString(),
-                            Objects.requireNonNull(dataSnapshot.child("age").getValue()).toString());
-                    mPatients.add(temp);
+                int k = 1;
+                Iterator<DataSnapshot> iterator = snapshot.getChildren().iterator();
+                List<DataSnapshot> dataSnapshotList = new ArrayList<>();
+                while (iterator.hasNext()) {
+                    dataSnapshotList.add(iterator.next());
                 }
-                changeAdapter(mPatients);
+                Collections.reverse(dataSnapshotList);
+                for (DataSnapshot dataSnapshot : dataSnapshotList) {
+                    final PatientObject temp = new PatientObject(dataSnapshot.child("name").getValue().toString(),
+                            dataSnapshot.getKey(),
+                            dataSnapshot.child("gender").getValue().toString(),
+                            dataSnapshot.child("age").getValue().toString());
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateAdapter(temp);
+                        }
+                    }, 300 * k);
+                    k++;
+                }
                 db.removeEventListener(this);
             }
 
@@ -202,35 +238,27 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
         });
     }
 
-    private void changeAdapter(ArrayList<PatientObject> mPatients) {
-        Collections.reverse(mPatients);
-        PatientAdapter adapter = new PatientAdapter(mPatients, this);
-        rv.setAdapter(adapter);
-        rv.setLayoutManager(new LinearLayoutManager(this));
+    private void updateAdapter(PatientObject temp) {
+        mPatients.add(temp);
+        recyclerAdapter.notifyItemInserted(mPatients.size() - 1);
     }
 
-    public void startAddActivity(View v) {
+    public void startForumActivity(View v) {
         Intent intent = new Intent(this, ForumActivity.class);
-        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
-                Pair.create(findViewById(R.id.uploadTestButton), "orangeBg"),
-                Pair.create(findViewById(R.id.uploadTestIcon), "plusIcon"));
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this, findViewById(R.id.fabBg), "containerTransform");
         startActivity(intent, options.toBundle());
     }
 
     @Override
-    public void onItemClick(int pos) {
+    public void onItemClick(int pos, View card) {
         Intent intent = new Intent(this, PatientActivity.class);
         intent.putExtra("patientObject", mPatients.get(pos));
-
-        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
-                Pair.create(findViewById(R.id.homeBottomBarLayout), "patientBottomBar"),
-                Pair.create((View) rv, "dataRecyclerView"));
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,card, "patientContainer");
         startActivity(intent, options.toBundle());
     }
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        u.alert();
         displayRecent();
         super.onConfigurationChanged(newConfig);
     }

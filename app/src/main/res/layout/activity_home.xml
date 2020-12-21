@@ -5,33 +5,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/blue"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawerLayoutHome">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/homeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/blue"
         tools:context=".Activities.HomeActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:stateListAnimator="@null">
+            android:layout_height="wrap_content">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/collapsingToolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/blue"
                 app:contentScrim="@color/blue"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
-                app:scrimVisibleHeightTrigger="200dp">
+                app:scrimVisibleHeightTrigger="250dp">
 
                 <ImageView
-                    android:id="@+id/imageView"
+                    android:id="@+id/patientActivityImg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
@@ -52,9 +49,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="365dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="Recent Patients"
+                    android:layout_marginTop="360dp"
+                    android:text="Recents"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     app:layout_collapseMode="parallax" />
@@ -63,65 +59,58 @@
                     android:id="@+id/toolbarHome"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/blue"
+                    android:elevation="4dp"
                     app:layout_collapseMode="pin"/>
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/homeBottomBarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:elevation="20dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:elevation="20dp"
-                android:src="@drawable/bg_bottom_bar"
-                android:stateListAnimator="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <ImageButton
-                android:id="@+id/uploadTestButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:background="@color/transparent"
-                android:src="@drawable/fab_shape"
-                android:transitionName="orangeBg"
-                android:stateListAnimator="@null"
-                android:onClick="startAddActivity"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/uploadTestIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:transitionName="plusIcon"
-                android:layout_marginBottom="50dp"
-                android:scaleX="1.5"
-                android:scaleY="1.5"
-                android:src="@drawable/icon_plus"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewHome"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_rounded_white"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:overScrollMode="never"
             android:clipToPadding="false"
-            android:elevation="8dp"
-            android:paddingTop="16dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fabBg"
+            android:transitionName="containerTransform"
+            android:background="@drawable/fab_shape"
+            android:layout_gravity="end|bottom"
+            android:translationX="8dp"
+            android:translationY="8dp"
+            android:scaleX="0"
+            android:scaleY="0"
+            android:elevation="6dp"
+            app:layout_anchor="@id/fabHome"
+            android:src="@drawable/fab_shape"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fabHome"
+            android:rotation="45"
+            android:src="@drawable/icon_plus_45"
+            android:background="@drawable/fab_shape"
+            android:onClick="startForumActivity"
+            app:maxImageSize="32dp"
+            app:layout_anchor="@id/bottomBarHome"
+            app:shapeAppearanceOverlay="@style/FabDiamondOverlay"/>
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottomBarHome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blue"
+            app:fabCradleMargin="24dp"
+            app:hideOnScroll="true"
+            app:fabCradleVerticalOffset="8dp"
+            android:layout_gravity="bottom" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

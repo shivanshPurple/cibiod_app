@@ -2,158 +2,165 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/addRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     android:background="@color/transparent"
-    tools:context=".Activities.LoginActivity">
-
-    <Button
-        android:id="@+id/addButton"
-        style="@style/ButtonTheme"
-        android:layout_marginBottom="88dp"
-        android:text="ADD!"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageButton
-        android:id="@+id/addHomeButtonForum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
-        android:background="@color/transparent"
-        android:src="@drawable/fab_shape"
-        android:transitionName="orangeBg"
-        android:stateListAnimator="@null"
-        android:scaleX="30"
-        android:scaleY="30"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/closeAddButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:transitionName="plusIcon"
-        android:scaleX="1.5"
-        android:scaleY="1.5"
-        android:src="@drawable/icon_plus"
+        android:layout_gravity="end|bottom"
+        android:background="@drawable/fab_shape"
+        android:scaleX="30"
+        android:scaleY="30"
+        android:layout_marginBottom="48dp"
+        android:transitionName="containerTransform"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <RelativeLayout
-        android:id="@+id/addNameGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="216dp"
-        android:layout_marginEnd="64dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/addRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".Activities.LoginActivity">
+
+        <Button
+            android:id="@+id/addButton"
+            style="@style/ButtonTheme"
+            android:layout_marginBottom="88dp"
+            android:text="ADD!"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
-            android:id="@+id/addNameRect"
-            android:layout_width="match_parent"
-            android:layout_height="29.5dp"
-            android:layout_alignTop="@+id/addNameEdit"
-            android:layout_alignParentStart="true"
-            android:scaleX="0"
-            app:srcCompat="@drawable/bg_edittext_onselect" />
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/addNameEdit"
-            android:layout_width="match_parent"
+            android:id="@+id/closeAddButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_edittext"
-            android:gravity="center"
-            android:backgroundTint="@color/white"
-            android:hint="NAME"
-            android:inputType="textPersonName"/>
+            android:layout_marginBottom="50dp"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:src="@drawable/icon_plus"
+            android:transitionName="plusIcon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/addAgeGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="64dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addNameGroup">
-
-        <ImageView
-            android:id="@+id/addAgeRect"
-            android:layout_width="match_parent"
-            android:layout_height="29.5dp"
-            android:layout_alignTop="@+id/addAgeEdit"
-            android:layout_alignParentStart="true"
-            android:scaleX="0"
-            app:srcCompat="@drawable/bg_edittext_onselect" />
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/addAgeEdit"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:id="@+id/addNameGroup"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_edittext"
-            android:backgroundTint="@color/white"
-            android:gravity="center"
-            android:hint="AGE"
-            android:inputType="number" />
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="216dp"
+            android:layout_marginEnd="64dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/addNameRect"
+                android:layout_width="match_parent"
+                android:layout_height="29.5dp"
+                android:layout_alignTop="@+id/addNameEdit"
+                android:layout_alignParentStart="true"
+                android:scaleX="0"
+                app:srcCompat="@drawable/bg_edittext_onselect" />
 
-    <RelativeLayout
-        android:id="@+id/addGenderGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="64dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addAgeGroup">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/addNameEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edittext"
+                android:backgroundTint="@color/white"
+                android:gravity="center"
+                android:hint="NAME"
+                android:inputType="textPersonName" />
 
-        <ImageView
-            android:id="@+id/addGenderPopupBg"
-            android:layout_width="match_parent"
-            android:layout_height="105dp"
-            android:layout_alignTop="@+id/genderSpinner"
-            android:layout_alignParentStart="true"
-            android:paddingBottom="0dp"
-            android:translationY="-105dp"
-            app:srcCompat="@drawable/bg_dropdown" />
+        </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/addGenderDropdownArrow"
-            android:layout_width="12dp"
-            android:layout_height="8dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="11dp"
-            android:layout_marginEnd="11dp"
-            android:scaleX="3"
-            android:scaleY="3"
-            app:srcCompat="@drawable/icon_dropdown" />
-
-        <com.cibiod.app.CustomViews.CustomSpinner
-            android:id="@+id/addGenderSpinner"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:id="@+id/addAgeGroup"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_edittext"
-            android:entries="@array/Gender"
-            android:popupBackground="@color/transparent"
-            android:theme="@style/SpinnerTheme" />
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="64dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addNameGroup">
 
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/addAgeRect"
+                android:layout_width="match_parent"
+                android:layout_height="29.5dp"
+                android:layout_alignTop="@+id/addAgeEdit"
+                android:layout_alignParentStart="true"
+                android:scaleX="0"
+                app:srcCompat="@drawable/bg_edittext_onselect" />
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/addAgeEdit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edittext"
+                android:backgroundTint="@color/white"
+                android:gravity="center"
+                android:hint="AGE"
+                android:inputType="number" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/addGenderGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="64dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addAgeGroup">
+
+            <ImageView
+                android:id="@+id/addGenderPopupBg"
+                android:layout_width="match_parent"
+                android:layout_height="105dp"
+                android:layout_alignTop="@+id/genderSpinner"
+                android:layout_alignParentStart="true"
+                android:paddingBottom="0dp"
+                android:translationY="-105dp"
+                app:srcCompat="@drawable/bg_dropdown" />
+
+            <ImageView
+                android:id="@+id/addGenderDropdownArrow"
+                android:layout_width="12dp"
+                android:layout_height="8dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="11dp"
+                android:layout_marginEnd="11dp"
+                android:scaleX="3"
+                android:scaleY="3"
+                app:srcCompat="@drawable/icon_dropdown" />
+
+            <com.cibiod.app.CustomViews.CustomSpinner
+                android:id="@+id/addGenderSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edittext"
+                android:entries="@array/Gender"
+                android:popupBackground="@color/transparent"
+                android:theme="@style/SpinnerTheme" />
+
+        </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

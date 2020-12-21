@@ -65,7 +65,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mRecyclerCallback.onItemClick(getAdapterPosition());
+                    mRecyclerCallback.onItemClick(getAdapterPosition(),null);
                 }
             });
         }

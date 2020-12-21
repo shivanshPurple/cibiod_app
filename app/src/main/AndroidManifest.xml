@@ -20,18 +20,23 @@
         <activity android:name=".Activities.IntroActivity" />
         <activity android:name=".Activities.BluetoothActivity" />
         <activity android:name=".Activities.ForumActivity" />
-        <activity android:name=".Activities.PatientActivity" />
-        <activity android:name=".Activities.LogoActivity" />
+        <activity
+            android:name=".Activities.PatientActivity"
+            android:parentActivityName=".Activities.HomeActivity" />
         <activity android:name=".Activities.LoginActivity" />
+        <activity android:name=".Activities.LogoActivity" />
         <activity android:name=".Activities.RegisterActivity" />
-        <activity android:name=".Activities.HomeActivity" />
-        <activity android:name=".Activities.SettingsActivity">
+        <activity android:name=".Activities.SettingsActivity" />
+        <activity android:name=".Activities.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

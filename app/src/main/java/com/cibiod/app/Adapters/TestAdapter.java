@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.cibiod.app.Objects.TestObject;
@@ -19,10 +20,12 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestViewHolder
 {
     List<TestObject> tests;
     RecyclerCallback callback;
+    Context context;
 
-    public TestAdapter(List<TestObject> tempTests, RecyclerCallback testRecyclerCallback) {
+    public TestAdapter(Context c, List<TestObject> tempTests, RecyclerCallback testRecyclerCallback) {
         tests = tempTests;
         callback = testRecyclerCallback;
+        context = c;
     }
 
     @NonNull
@@ -42,6 +45,10 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestViewHolder
         textView.setText(p.getDate());
         TextView textView2 = holder.timeText;
         textView2.setText(p.getTime());
+
+        View card = holder.containerCard;
+
+        card.setAnimation(AnimationUtils.loadAnimation(context,R.anim.recycler_anim));
     }
 
     @Override
@@ -52,6 +59,7 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestViewHolder
     class TestViewHolder extends RecyclerView.ViewHolder {
         public TextView dateText;
         public TextView timeText;
+        public View containerCard;
 
         public TestViewHolder(View itemView)
         {
@@ -59,11 +67,12 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.TestViewHolder
 
             dateText = itemView.findViewById(R.id.dateAdapter);
             timeText = itemView.findViewById(R.id.timeAdapter);
+            containerCard = itemView.findViewById(R.id.testCard);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    callback.onItemClick(getAdapterPosition());
+                    callback.onItemClick(getAdapterPosition(),containerCard);
                 }
             });
         }
