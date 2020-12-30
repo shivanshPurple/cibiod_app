@@ -54,7 +54,7 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.patientV
 
         View card = holder.patientCard;
 
-        card.setAnimation(AnimationUtils.loadAnimation(context,R.anim.recycler_anim));
+        card.startAnimation(AnimationUtils.loadAnimation(context,R.anim.recycler_anim));
     }
 
     @Override

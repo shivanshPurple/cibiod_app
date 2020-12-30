@@ -1,7 +1,6 @@
 package com.cibiod.app.Activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -14,6 +13,7 @@ import android.widget.Toast;
 import com.cibiod.app.CustomViews.CustomSpinner;
 import com.cibiod.app.R;
 import com.cibiod.app.Utils.u;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,9 +21,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText emailText,passwordText,confirmPasswordText;
+    private EditText emailText, passwordText, confirmPasswordText;
     private CustomSpinner genderDropdown;
 
     @Override
@@ -43,38 +46,47 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordText = findViewById(R.id.editConfirmPassword);
         final ImageView confirmPasswordRect = findViewById(R.id.confirmPasswordRect);
 
-        u.setupEditText(this,emailText,emailRect,"E MAIL",false);
-        u.setupEditText(this,passwordText,passwordRect,"PASSWORD",false);
-        u.setupEditText(this,confirmPasswordText,confirmPasswordRect,"CONFIRM PASSWORD",true);
+        u.setupEditText(this, emailText, emailRect, "E MAIL", false);
+        u.setupEditText(this, passwordText, passwordRect, "PASSWORD", false);
+        u.setupEditText(this, confirmPasswordText, confirmPasswordRect, "CONFIRM PASSWORD", true);
 
         genderDropdown = findViewById(R.id.genderSpinner);
         final ImageView genderPopupBg = findViewById(R.id.genderPopupBg);
         final ImageView genderDropdownArrow = findViewById(R.id.genderDropdownArrow);
 
-        u.setupDropdown(this,genderDropdown,R.array.Gender,genderPopupBg,genderDropdownArrow);
+        u.setupDropdown(this, genderDropdown, R.array.Gender, genderPopupBg, genderDropdownArrow);
 
         final Button registerFinalButton = findViewById(R.id.registerButtonFinal);
         registerFinalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                registerFinalButton.setClickable(false);
+                ObjectAnimator.ofFloat(registerFinalButton,"alpha",1,0).setDuration(300).start();
                 final String emailVal = emailText.getText().toString().toLowerCase();
                 final String passwordVal = passwordText.getText().toString();
                 String confirmPasswordVal = confirmPasswordText.getText().toString();
                 final String genderVal = genderDropdown.getSelectedItem().toString();
-                if(!emailVal.contains("@") || emailVal.isEmpty())
-                {
+                if (!emailVal.contains("@") | !emailVal.contains(".") |
+                        emailVal.contains("#") |
+                        emailVal.contains("$") |
+                        emailVal.contains("[") |
+                        emailVal.contains("]")) {
                     emailText.setError("Invalid Email");
+                    registerFinalButton.setClickable(true);
+                    ObjectAnimator.ofFloat(registerFinalButton,"alpha",0,1).setDuration(300).start();
                     return;
                 }
-                if(passwordVal.isEmpty() || !confirmPasswordVal.equals(passwordVal))
-                {
+                if (passwordVal.isEmpty() || !confirmPasswordVal.equals(passwordVal)) {
                     confirmPasswordText.setError("Passwords don't match");
                     passwordText.setError("Passwords don't match");
+                    registerFinalButton.setClickable(true);
+                    ObjectAnimator.ofFloat(registerFinalButton,"alpha",0,1).setDuration(300).start();
                     return;
                 }
-                if(genderVal.equals("GENDER"))
-                {
-                    Toast.makeText(RegisterActivity.this,"Select a gender",Toast.LENGTH_LONG).show();
+                if (genderVal.equals("GENDER")) {
+                    Toast.makeText(RegisterActivity.this, "Select a gender", Toast.LENGTH_LONG).show();
+                    registerFinalButton.setClickable(true);
+                    ObjectAnimator.ofFloat(registerFinalButton,"alpha",0,1).setDuration(300).start();
                     return;
                 }
 
@@ -84,23 +96,29 @@ public class RegisterActivity extends AppCompatActivity {
 
                 search.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.hasChildren())
-                        {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChildren()) {
                             emailText.setError("Email Already Exists");
-                        }
-                        else
-                        {
-                            dbRef.child(emailVal).child("password").setValue(passwordVal);
-                            dbRef.child(emailVal).child("gender").setValue(genderVal);
-                            RegisterActivity.this.onBackPressed();
+                            registerFinalButton.setClickable(true);
+                            ObjectAnimator.ofFloat(registerFinalButton,"alpha",0,1).setDuration(300).start();
+                        } else {
+                            String emailKey = emailVal.replace(".", "");
+                            dbRef.child(emailKey).child("password").setValue(passwordVal);
+                            dbRef.child(emailKey).child("email").setValue(emailVal);
+                            dbRef.child(emailKey).child("gender").setValue(genderVal).addOnSuccessListener(RegisterActivity.this, new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(getApplicationContext(), "New user registered!", Toast.LENGTH_LONG).show();
+                                    RegisterActivity.this.onBackPressed();
+                                }
+                            });
                         }
                         dbRef.removeEventListener(this);
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Toast.makeText(getApplicationContext(),"Database Connection Error", Toast.LENGTH_LONG).show();
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Toast.makeText(getApplicationContext(), "Database Connection Error", Toast.LENGTH_LONG).show();
                     }
                 });
             }

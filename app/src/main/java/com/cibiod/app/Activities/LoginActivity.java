@@ -1,11 +1,8 @@
 package com.cibiod.app.Activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
@@ -25,6 +22,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 public class LoginActivity extends AppCompatActivity {
 
     @Override
@@ -41,56 +41,57 @@ public class LoginActivity extends AppCompatActivity {
         final EditText passwordText = findViewById(R.id.editPassword);
         final ImageView passwordRect = findViewById(R.id.passwordRect);
 
-        u.setupEditText(LoginActivity.this,emailText,emailRect,"E MAIL",false);
-        u.setupEditText(LoginActivity.this,passwordText,passwordRect,"PASSWORD",true);
+        u.setupEditText(LoginActivity.this, emailText, emailRect, "E MAIL", false);
+        u.setupEditText(LoginActivity.this, passwordText, passwordRect, "PASSWORD", true);
 
-        Button loginButton = findViewById(R.id.loginButton);
+        final Button loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loginButton.setClickable(false);
+                ObjectAnimator.ofFloat(loginButton, "alpha", 1, 0).setDuration(300).start();
                 final String emailVal = emailText.getText().toString();
+                final String emailKey = emailVal.replace(".", "");
                 final String passwordVal = passwordText.getText().toString();
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 final DatabaseReference dbRef = database.getReference("users");
-                final Query search = dbRef.orderByKey().equalTo(emailVal);
+                final Query search = dbRef.orderByKey().equalTo(emailKey);
 
                 search.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.hasChildren())
-                        {
-                            for(DataSnapshot snapshot : dataSnapshot.getChildren())
-                            {
-                                if(passwordVal.equals(snapshot.child("password").getValue().toString()))
-                                {
-                                    SharedPreferences prefs = getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = prefs.edit();
-                                    editor.putString("id",emailVal);
-                                    editor.apply();
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChildren()) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                if (passwordVal.equals(snapshot.child("password").getValue().toString())) {
+                                    u.setPref(LoginActivity.this, "id", emailKey);
                                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intent);
-                                }
-                                else
+                                } else {
                                     passwordText.setError("Wrong password");
+                                    loginButton.setClickable(true);
+                                    ObjectAnimator.ofFloat(loginButton, "alpha", 0, 1).setDuration(300).start();
+                                }
                             }
-                        }
-                        else
+                        } else {
                             emailText.setError("Email not registered");
+                            loginButton.setClickable(true);
+                            ObjectAnimator.ofFloat(loginButton, "alpha", 0, 1).setDuration(300).start();
+                        }
                         dbRef.removeEventListener(this);
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Toast.makeText(getApplicationContext(),"Database Connection Error", Toast.LENGTH_LONG).show();
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Toast.makeText(getApplicationContext(), "Database Connection Error", Toast.LENGTH_LONG).show();
                     }
                 });
             }
         });
     }
 
-    public void startRegActivity(View v)
-    {
+    public void startRegActivity(View v) {
         Intent intent = new Intent(this, RegisterActivity.class);
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                 Pair.create(findViewById(R.id.emailGroup), "emailShared"),

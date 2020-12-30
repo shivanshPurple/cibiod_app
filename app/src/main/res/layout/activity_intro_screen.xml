@@ -89,7 +89,7 @@
         android:id="@+id/bluetoothGroup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="1"
+        android:alpha="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -99,7 +99,7 @@
             android:id="@+id/bluetoothTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             android:fontFamily="@font/roboto_black"
             android:letterSpacing="0.05"
             android:text="WIRELESS \nTECHNOLOGY"
@@ -126,15 +126,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/bluetoothTitle" />
 
-        <ImageView
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/bluetoothVector"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="108dp"
+            android:layout_height="260dp"
+            android:layout_marginTop="96dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/vector_bluetooth" />
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="bluetooth_anim.json"
+            app:lottie_loop="true"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -178,15 +180,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cloudTitle" />
 
-        <ImageView
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/cloudVector"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="108dp"
+            android:layout_height="260dp"
+            android:layout_marginTop="96dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/vector_cloud" />
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="cloud_anim.json"
+            app:lottie_loop="true"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -203,7 +207,6 @@
             android:id="@+id/inAppTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:fontFamily="@font/roboto_black"
             android:letterSpacing="0.05"
             android:text="IN APP \nPROCESSING"
@@ -229,15 +232,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inAppTitle" />
 
-        <ImageView
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/inAppVector"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="108dp"
+            android:layout_height="280dp"
+            android:layout_marginTop="96dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/vector_inapp_processing" />
+            app:lottie_autoPlay="true"
+            app:lottie_repeatMode="reverse"
+            app:lottie_speed="0.75"
+            app:lottie_fileName="processing_anim.json"
+            app:lottie_loop="true"/>
 
         <Button
             android:id="@+id/introButton"

@@ -5,23 +5,24 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Outline;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cibiod.app.R;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.cibiod.app.Utils.u;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,10 +30,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static android.Manifest.permission.BLUETOOTH;
 import static android.Manifest.permission.BLUETOOTH_ADMIN;
 import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WAKE_LOCK;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 
@@ -44,11 +47,7 @@ public class LogoActivity extends AppCompatActivity implements GestureDetector.O
     private boolean animationStarted;
     private ImageView orangeBg;
     private float screenDepth, swipeAmount;
-
-    private float maxSwipeDist = 900, minSwipeAmt = 0.8f;
-
-    private LinearLayout bottomLayout;
-    private BottomSheetBehavior bottomSheetBehavior;
+    private TextView swipeUpText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +59,7 @@ public class LogoActivity extends AppCompatActivity implements GestureDetector.O
         setContentView(R.layout.activity_logo_screen);
 
         ImageButton logo = findViewById(R.id.logo);
-        TextView swipeUpText = findViewById(R.id.swipeUpText);
+        swipeUpText = findViewById(R.id.swipeUpText);
         orangeBg = findViewById(R.id.orangeBg);
 
         final Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fadein);
@@ -88,8 +87,24 @@ public class LogoActivity extends AppCompatActivity implements GestureDetector.O
                 ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_FINE_LOCATION) == PERMISSION_DENIED |
                 ContextCompat.checkSelfPermission(getApplicationContext(), INTERNET) == PERMISSION_DENIED |
                 ContextCompat.checkSelfPermission(getApplicationContext(), BLUETOOTH) == PERMISSION_DENIED |
-                ContextCompat.checkSelfPermission(getApplicationContext(), BLUETOOTH_ADMIN) == PERMISSION_DENIED)
-            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, INTERNET, BLUETOOTH, BLUETOOTH_ADMIN}, 12);
+                ContextCompat.checkSelfPermission(getApplicationContext(), BLUETOOTH_ADMIN) == PERMISSION_DENIED |
+                ContextCompat.checkSelfPermission(getApplicationContext(), WAKE_LOCK) == PERMISSION_DENIED |
+                ContextCompat.checkSelfPermission(getApplicationContext(), ACCESS_NETWORK_STATE) == PERMISSION_DENIED)
+            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, INTERNET, BLUETOOTH, BLUETOOTH_ADMIN, WAKE_LOCK, ACCESS_NETWORK_STATE}, 12);
+
+        String id = u.getPref(this, "id");
+        if (!id.equals("NA")) {
+            animationStarted = true;
+            swipeUpText.setAlpha(0);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(LogoActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }, 4000);
+        }
     }
 
     private void startApp() {
@@ -108,17 +123,16 @@ public class LogoActivity extends AppCompatActivity implements GestureDetector.O
                 Toast.makeText(this, "Permissions required fpr app to work!", Toast.LENGTH_LONG).show();
                 requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, INTERNET, BLUETOOTH, BLUETOOTH_ADMIN}, 12);
             }
-
-            if (resultCode == RESULT_OK)
-                ;
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         gestureDetectorCompat.onTouchEvent(event);
+        float minSwipeAmt = 0.8f;
         if (startPosition != 0) {
             swipeAmount = startPosition - event.getY();
+            float maxSwipeDist = 900;
             swipeAmount = swipeAmount / maxSwipeDist;
             swipeAmount = Math.min(Math.max(0, swipeAmount), 1);
             if (!animationStarted) {

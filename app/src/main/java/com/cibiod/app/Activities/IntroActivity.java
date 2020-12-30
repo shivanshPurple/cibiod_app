@@ -56,11 +56,13 @@ public class IntroActivity extends AppCompatActivity implements GestureDetector.
             }
         });
 
+
         gestureDetectorCompat = new GestureDetectorCompat(this, this);
 
         bluetoothGroup = findViewById(R.id.bluetoothGroup);
-        Animation animFadein = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fadein2);
-        bluetoothGroup.startAnimation(animFadein);
+        ObjectAnimator oa = ObjectAnimator.ofFloat(bluetoothGroup,"alpha",0,1);
+        oa.setDuration(1000).setInterpolator(new AccelerateInterpolator());
+        oa.start();
         cloudGroup = findViewById(R.id.cloudGroup);
         inAppGroup = findViewById(R.id.inAppGroup);
 

@@ -3,7 +3,7 @@
     <alpha
         android:duration="600"
         android:fromAlpha="0"
-        android:interpolator="@android:anim/overshoot_interpolator"
+        android:interpolator="@android:anim/accelerate_interpolator"
         android:toAlpha="1" />
 
     <scale
@@ -11,7 +11,7 @@
         android:fillBefore="false"
         android:fromXScale="0.5"
         android:fromYScale="0.5"
-        android:interpolator="@android:anim/overshoot_interpolator"
+        android:interpolator="@android:anim/accelerate_interpolator"
         android:toXScale="1"
         android:toYScale="1" />
 

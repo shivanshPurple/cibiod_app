@@ -1,12 +1,13 @@
 package com.cibiod.app.Activities;
 
-import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.transition.Transition;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,12 +46,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class PatientActivity extends AppCompatActivity implements RecyclerCallback {
     private DatabaseReference db;
-    private ArrayList<TestObject> mTests = new ArrayList<>();
+    private final ArrayList<TestObject> mTests = new ArrayList<>();
 
     private PatientObject patient;
     private RecyclerView rv;
+    private String id;
+    private ViewStub viewStub;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setEnterSharedElementCallback(new MaterialContainerTransformSharedElementCallback());
@@ -58,7 +60,6 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
         getWindow().setSharedElementReturnTransition(customTransition());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient);
-        u.sharedTransFix(getWindow(), R.color.blue);
         Toolbar toolbar = findViewById(R.id.toolbarPatient);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -67,6 +68,8 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
         NavigationView navigationView = findViewById(R.id.navViewPatient);
 
         u.setupToolbar(this, drawerLayout, navigationView, toolbar, "Patient", 170);
+        viewStub = findViewById(R.id.viewStubPatient);
+        u.setViewStub(this, viewStub, "loading");
 
         BottomAppBar bar = findViewById(R.id.bottomBarPatient);
 
@@ -84,13 +87,20 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
                         .setTopEdge(topEdge)
                         .build());
 
+        id = u.getPref(this, "id");
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         db = database.getReference("users");
 
         patient = (PatientObject) getIntent().getSerializableExtra("patientObject");
 
         rv = findViewById(R.id.recyclerViewHome);
-        displayRecentTests(patient);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                displayRecentTests(patient);
+            }
+        }, 600);
 
         TextView patientName = findViewById(R.id.patientName);
         patientName.setText(patient.getName());
@@ -114,12 +124,14 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
     }
 
     private void displayRecentTests(PatientObject patient) {
-
-        Query lastEntries = db.child("q@w").child("patients").child(patient.getId()).limitToLast(10);
+        final Query lastEntries = db.child(id).child("patients").child(patient.getId()).limitToLast(10);
 
         lastEntries.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                u.setViewStub(PatientActivity.this, viewStub, "clear");
+                db.removeEventListener(this);
+                lastEntries.removeEventListener(this);
                 mTests.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     if (u.isNumeric(dataSnapshot.getKey())) {
@@ -131,6 +143,9 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
                         mTests.add(temp);
                     }
                 }
+                if (mTests.size() == 0)
+                    u.setViewStub(PatientActivity.this, viewStub, "empty");
+
                 changeTestAdapter(mTests);
                 db.removeEventListener(this);
             }
@@ -138,6 +153,7 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(getApplicationContext(), "Firebase Connection Error", Toast.LENGTH_LONG).show();
+                u.setViewStub(PatientActivity.this, viewStub, "empty");
             }
         });
     }
@@ -154,7 +170,6 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
         Intent intent = new Intent(this, BluetoothActivity.class);
         intent.putExtra("testObject", mTests.get(pos));
         intent.putExtra("from", "cloud");
-
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this, card, "testContainer");
         startActivity(intent, options.toBundle());
     }
@@ -166,5 +181,16 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
 
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this);
         startActivity(intent, options.toBundle());
+    }
+
+    @Override
+    protected void onResume() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                displayRecentTests(patient);
+            }
+        }, 600);
+        super.onResume();
     }
 }

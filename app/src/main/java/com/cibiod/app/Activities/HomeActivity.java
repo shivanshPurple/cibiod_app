@@ -5,15 +5,12 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.transition.ChangeBounds;
-import android.transition.Transition;
 import android.transition.TransitionManager;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
+import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,6 +27,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,14 +55,15 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
     private ArrayList<PatientObject> mPatients = new ArrayList<>();
     private PatientAdapter recyclerAdapter;
 
-    private RecyclerView rv;
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
+    private String id;
+    private ViewStub viewStub;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        FirebaseApp.initializeApp(this);
         setExitSharedElementCallback(new MaterialContainerTransformSharedElementCallback());
-        getWindow().setSharedElementsUseOverlay(false);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         u.sharedTransFix(getWindow(), R.color.blue);
@@ -77,6 +76,9 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayoutHome);
         NavigationView navigationView = findViewById((R.id.navViewHome));
         u.setupToolbar(this, drawerLayout, navigationView, toolbar, "Home", 55);
+
+        viewStub = findViewById(R.id.viewStubHome);
+        u.setViewStub(this, viewStub, "loading");
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         db = database.getReference("users");
@@ -97,13 +99,13 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
                         .setTopEdge(topEdge)
                         .build());
 
-        rv = findViewById(R.id.recyclerViewHome);
+        RecyclerView rv = findViewById(R.id.recyclerViewHome);
 
         recyclerAdapter = new PatientAdapter(this, mPatients, this);
         rv.setAdapter(recyclerAdapter);
         rv.setLayoutManager(new LinearLayoutManager(this));
 
-        displayRecent();
+        id = u.getPref(this, "id");
     }
 
     SearchView searchView;
@@ -143,21 +145,6 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
             }
         });
 
-        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                searchView.clearFocus();
-                appBarLayout.setExpanded(true);
-                displayRecent();
-                return true;
-            }
-        });
-
         return true;
     }
 
@@ -173,7 +160,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
 
     private void searchDB(String s) {
         String lowercaseS = s.toLowerCase();
-        final Query search = db.child("q@w/patients").orderByChild("lowercase").startAt(lowercaseS).endAt(lowercaseS + "\uf8ff").limitToLast(10);
+        final Query search = db.child(id + "/patients").orderByChild("lowercase").startAt(lowercaseS).endAt(lowercaseS + "\uf8ff").limitToLast(10);
 
         search.addValueEventListener(new ValueEventListener() {
             @Override
@@ -202,19 +189,29 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
     }
 
     private void displayRecent() {
-        Query lastEntries = db.child("q@w").child("patients").limitToLast(25);
+        final Query lastEntries = db.child(id).child("patients").orderByKey().limitToLast(25);
         lastEntries.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                recyclerAdapter.notifyItemRangeRemoved(0, mPatients.size());
+                db.removeEventListener(this);
+                lastEntries.removeEventListener(this);
+                int oldSize = mPatients.size();
                 mPatients.clear();
+                recyclerAdapter.notifyItemRangeRemoved(0, oldSize);
                 int k = 1;
                 Iterator<DataSnapshot> iterator = snapshot.getChildren().iterator();
                 List<DataSnapshot> dataSnapshotList = new ArrayList<>();
-                while (iterator.hasNext()) {
+
+                while (iterator.hasNext())
                     dataSnapshotList.add(iterator.next());
-                }
+
+                if (dataSnapshotList.size() == 0)
+                    u.setViewStub(HomeActivity.this, viewStub, "empty");
+                else
+                    u.setViewStub(HomeActivity.this, viewStub, "clear");
+
                 Collections.reverse(dataSnapshotList);
+
                 for (DataSnapshot dataSnapshot : dataSnapshotList) {
                     final PatientObject temp = new PatientObject(dataSnapshot.child("name").getValue().toString(),
                             dataSnapshot.getKey(),
@@ -225,15 +222,15 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
                         public void run() {
                             updateAdapter(temp);
                         }
-                    }, 300 * k);
+                    }, 200 * k);
                     k++;
                 }
-                db.removeEventListener(this);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(getApplicationContext(), "Firebase Connection Error", Toast.LENGTH_LONG).show();
+                u.setViewStub(HomeActivity.this, viewStub, "empty");
             }
         });
     }
@@ -253,7 +250,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
     public void onItemClick(int pos, View card) {
         Intent intent = new Intent(this, PatientActivity.class);
         intent.putExtra("patientObject", mPatients.get(pos));
-        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,card, "patientContainer");
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this, card, "patientContainer");
         startActivity(intent, options.toBundle());
     }
 
@@ -261,5 +258,11 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         displayRecent();
         super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    protected void onResume() {
+        displayRecent();
+        super.onResume();
     }
 }

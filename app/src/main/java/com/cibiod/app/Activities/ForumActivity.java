@@ -1,8 +1,6 @@
 package com.cibiod.app.Activities;
 
 import android.animation.ObjectAnimator;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.transition.ChangeBounds;
@@ -14,7 +12,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnticipateOvershootInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,8 +22,7 @@ import com.cibiod.app.CustomViews.CustomSpinner;
 import com.cibiod.app.R;
 import com.cibiod.app.Utils.u;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.transition.platform.MaterialContainerTransform;
-import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -71,7 +67,7 @@ public class ForumActivity extends AppCompatActivity {
 
         u.setupDropdown(this, genderDropdown, R.array.Gender, genderPopupBg, genderDropdownArrow);
 
-        ObjectAnimator oa = ObjectAnimator.ofFloat(findViewById(R.id.addRoot),"alpha",0,1).setDuration(300);
+        ObjectAnimator oa = ObjectAnimator.ofFloat(findViewById(R.id.addRoot), "alpha", 0, 1).setDuration(300);
         oa.setStartDelay(1000);
         oa.setInterpolator(new AccelerateInterpolator());
         oa.start();
@@ -113,28 +109,24 @@ public class ForumActivity extends AppCompatActivity {
                     return;
                 }
 
-                SharedPreferences prefs = getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
-                String id = prefs.getString("id", "users");
-
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 final DatabaseReference dbRef = database.getReference("users");
-                final Query idGetter = dbRef.child("q@w").child("patients").limitToLast(1).orderByKey();
-
+                final Query idGetter = dbRef.child(u.getPref(ForumActivity.this, "id")).child("patients").limitToLast(1).orderByKey();
                 idGetter.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         idGetter.removeEventListener(this);
                         dbRef.removeEventListener(this);
-                        for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                            String id;
-                            if (postSnapshot.hasChildren()) {
+                        String id = null;
+                        if (snapshot.hasChildren()) {
+                            for (DataSnapshot postSnapshot : snapshot.getChildren()) {
                                 int temp = Integer.parseInt(Objects.requireNonNull(postSnapshot.getKey()));
                                 id = Integer.toString(++temp);
-                            } else {
-                                id = Integer.toString(1);
                             }
-                            addToDb(dbRef, "q@w", nameVal, ageVal, genderVal, id);
-                        }
+                        } else
+                            id = Integer.toString(1);
+
+                        addToDb(dbRef, nameVal, ageVal, genderVal, id);
                     }
 
                     @Override
@@ -156,29 +148,37 @@ public class ForumActivity extends AppCompatActivity {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-
-//                startActivity(intent, options.toBundle());
                 ForumActivity.this.onBackPressed();
             }
         };
         new Handler().postDelayed(r, 800);
     }
 
-    void addToDb(DatabaseReference dbRef, String userId, String name, String age, String gender, String id) {
+    void addToDb(DatabaseReference dbRef, String name, String age, String gender, String id) {
         String[] split = name.split(" ");
         StringBuilder builder = new StringBuilder();
         for (String s : split) {
             String cap = s.substring(0, 1).toUpperCase() + s.substring(1);
             builder.append(cap).append(" ");
         }
+        builder.deleteCharAt(builder.length() - 1);
         name = builder.toString();
+        final String userId = u.getPref(this, "id");
         dbRef.child(userId).child("patients").child(id).child("name").setValue(name);
         dbRef.child(userId).child("patients").child(id).child("age").setValue(age);
         dbRef.child(userId).child("patients").child(id).child("gender").setValue(gender);
+        final String finalName = name;
         dbRef.child(userId).child("patients").child(id).child("lowercase").setValue(name.toLowerCase()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(ForumActivity.this,"Added to Database",Toast.LENGTH_LONG).show();
+
+                FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(ForumActivity.this);
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, userId);
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, finalName);
+                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
+                Toast.makeText(ForumActivity.this, "Added to Database", Toast.LENGTH_LONG).show();
                 goBack();
             }
         });

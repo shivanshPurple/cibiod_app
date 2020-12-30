@@ -1,19 +1,21 @@
 package com.cibiod.app.Fragments;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.cibiod.app.Activities.BluetoothActivity;
+import com.cibiod.app.Activities.SettingsActivity;
 import com.cibiod.app.Adapters.DeviceAdapter;
 import com.cibiod.app.Callbacks.RecyclerCallback;
 import com.cibiod.app.Objects.BluetoothDeviceObject;
@@ -33,11 +35,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class BottomSheetBluetoothDevice extends BottomSheetDialogFragment implements RecyclerCallback {
 
-    private BluetoothAdapter bluetoothAdapter;
-    private ArrayList<BluetoothDeviceObject> devices = new ArrayList<>();
+    private final BluetoothAdapter bluetoothAdapter;
+    private final ArrayList<BluetoothDeviceObject> devices = new ArrayList<>();
     private RecyclerView rv;
     private ProgressView progressView;
     private Context thisContext;
+    private boolean fromSettings = false;
+
+    public BottomSheetBluetoothDevice(BluetoothAdapter ba, boolean b) {
+        bluetoothAdapter = ba;
+        fromSettings = b;
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -80,18 +88,24 @@ public class BottomSheetBluetoothDevice extends BottomSheetDialogFragment implem
     }
 
     private void searchDevices() {
-        bluetoothAdapter.startDiscovery();
-        IntentFilter filter = new IntentFilter(android.bluetooth.BluetoothDevice.ACTION_FOUND);
-        LocalBroadcastManager.getInstance(thisContext).registerReceiver(receiver,filter);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        LocalBroadcastManager.getInstance(thisContext).registerReceiver(receiver, filter);
         thisContext.registerReceiver(receiver, filter);
-        progressView.start();
+        bluetoothAdapter.startDiscovery();
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            u.alert();
             String action = intent.getAction();
-            if (android.bluetooth.BluetoothDevice.ACTION_FOUND.equals(action)) {
+            u.print(action);
+            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
+                progressView.start();
+            if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))
+                bluetoothAdapter.startDiscovery();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 android.bluetooth.BluetoothDevice device = intent.getParcelableExtra(android.bluetooth.BluetoothDevice.EXTRA_DEVICE);
                 devices.add(new BluetoothDeviceObject(device.getName(), device.getAddress()));
                 updateList();
@@ -107,15 +121,27 @@ public class BottomSheetBluetoothDevice extends BottomSheetDialogFragment implem
 
     @Override
     public void onItemClick(int position, View card) {
+        u.setPref(thisContext,"pairedStethoAddress", devices.get(position).getAddress());
+        u.setPref(thisContext,"pairedStethoName", devices.get(position).getName());
         if (bluetoothAdapter.isDiscovering())
             bluetoothAdapter.cancelDiscovery();
 
-        SharedPreferences prefs = getActivity().getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("pairedStethoAddress", devices.get(position).getAddress());
-        editor.apply();
-        ((BluetoothActivity) getActivity()).startBluetoothService();
+        if (!fromSettings) {
+            ((BluetoothActivity) getActivity()).startBluetoothService();
+        } else {
+            TextView tv = ((SettingsActivity) getActivity()).findViewById(R.id.deviceName);
+            tv.setText(devices.get(position).getName());
+        }
+
         this.dismiss();
+    }
+
+    @Override
+    public void onCancel(@NonNull DialogInterface dialog) {
+        this.dismiss();
+        if (!fromSettings)
+            ((BluetoothActivity) getActivity()).startBluetoothService();
+        super.onCancel(dialog);
     }
 
     @Override

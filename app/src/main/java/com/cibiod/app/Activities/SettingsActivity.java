@@ -2,6 +2,7 @@ package com.cibiod.app.Activities;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -11,7 +12,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.cibiod.app.Fragments.BottomSheetBluetoothDevice;
 import com.cibiod.app.R;
 import com.cibiod.app.Utils.BottomAppBarCutCornersTopEdge;
 import com.cibiod.app.Utils.VolumeObserver;
@@ -23,6 +27,7 @@ import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.MaterialShapeDrawable;
 import com.rey.material.widget.Slider;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -30,6 +35,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 public class SettingsActivity extends AppCompatActivity {
     private VolumeObserver volumeObserver;
+    private BluetoothAdapter bluetoothAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +77,19 @@ public class SettingsActivity extends AppCompatActivity {
         slider.setOnPositionChangeListener(new Slider.OnPositionChangeListener() {
             @Override
             public void onPositionChanged(Slider view, boolean fromUser, float oldPos, float newPos, int oldValue, int newValue) {
-                audio.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (newPos * maxVolume), AudioManager.FLAG_PLAY_SOUND + AudioManager.FLAG_SHOW_UI);
+                audio.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (newPos * maxVolume), 0);
             }
         });
 
         volumeObserver = new VolumeObserver(this, slider, new Handler());
         getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, volumeObserver);
 //        endregion
+
+        String deviceName = u.getPref(this, "pairedStethoName");
+        if (deviceName.equals("NA"))
+            ((TextView) findViewById(R.id.deviceName)).setText("No Device");
+        else
+            ((TextView) findViewById(R.id.deviceName)).setText(deviceName);
 
         findViewById(R.id.cibiodLink).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +124,11 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.logoutButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                unregister from shared prefs
+                u.logout(SettingsActivity.this);
+                Intent intent = new Intent(SettingsActivity.this, LogoActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slideupfromdown, 0);
             }
         });
 
@@ -122,9 +138,45 @@ public class SettingsActivity extends AppCompatActivity {
                 SettingsActivity.this.finish();
             }
         });
+
+        findViewById(R.id.changeDeviceGroup).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AnimatorSet as = new AnimatorSet();
+                as.playSequentially(ObjectAnimator.ofArgb(v, "backgroundColor", Color.WHITE, Color.LTGRAY).setDuration(200),
+                        ObjectAnimator.ofArgb(v, "backgroundColor", Color.LTGRAY, Color.WHITE).setDuration(200));
+                as.setInterpolator(new DecelerateInterpolator());
+                as.start();
+
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (bluetoothAdapter == null)
+                    Toast.makeText(SettingsActivity.this, "Bluetooth Required", Toast.LENGTH_LONG).show();
+
+                else if (!bluetoothAdapter.isEnabled()) {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, 97);
+                } else {
+                    BottomSheetBluetoothDevice bottomSheet = new BottomSheetBluetoothDevice(bluetoothAdapter, true);
+                    bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
+                }
+            }
+        });
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 97) {
+            if (resultCode == RESULT_OK) {
+                BottomSheetBluetoothDevice bottomSheet = new BottomSheetBluetoothDevice(bluetoothAdapter, true);
+                bottomSheet.show(getSupportFragmentManager(), "bottomSheet");
+            } else {
+                Toast.makeText(this, "Bluetooth is required to connect", Toast.LENGTH_LONG).show();
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, 11);
+            }
+        }
+    }
 
     @Override
     protected void onDestroy() {

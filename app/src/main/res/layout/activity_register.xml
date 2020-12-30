@@ -14,7 +14,6 @@
         style="@style/ButtonTheme"
         android:layout_marginBottom="80dp"
         android:text="REGISTER"
-        android:textStyle="bold"
         android:transitionName="sharedLoginRegisterButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -139,6 +139,13 @@
             app:fabCradleVerticalOffset="8dp"
             app:hideOnScroll="true" />
 
+        <ViewStub
+            android:layout_width="wrap_content"
+            android:id="@+id/viewStubPatient"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="125dp" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
