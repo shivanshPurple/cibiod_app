@@ -2,13 +2,17 @@ package com.cibiod.app.Activities;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.transition.Transition;
 import android.view.View;
 import android.view.ViewStub;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +23,8 @@ import com.cibiod.app.Objects.TestObject;
 import com.cibiod.app.R;
 import com.cibiod.app.Utils.BottomAppBarCutCornersTopEdge;
 import com.cibiod.app.Utils.u;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.bottomappbar.BottomAppBarTopEdgeTreatment;
 import com.google.android.material.navigation.NavigationView;
@@ -32,7 +38,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -110,6 +120,31 @@ public class PatientActivity extends AppCompatActivity implements RecyclerCallba
         patientAge.setText(patient.getAge());
         TextView patientGender = findViewById(R.id.patientGender);
         patientGender.setText(patient.getGender());
+        ImageView patientImg = findViewById(R.id.patientImg);
+        setPatientImage(patientImg);
+    }
+
+    private void setPatientImage(final ImageView patientImg) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference dataRef = storage.getReferenceFromUrl(patient.getPhotoUrl());
+
+        String imageFileName = patient.getName() + ".jpg";
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String pictureImagePath = storageDir.getAbsolutePath() + "/" + imageFileName;
+        final File file = new File(pictureImagePath);
+
+        dataRef.getFile(file).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                Bitmap imageBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+                patientImg.setImageBitmap(imageBitmap);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(PatientActivity.this, exception.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private Transition customTransition() {

@@ -3,21 +3,83 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/transparent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
+        android:layout_marginBottom="48dp"
         android:background="@drawable/fab_shape"
         android:scaleX="30"
         android:scaleY="30"
-        android:layout_marginBottom="48dp"
         android:transitionName="containerTransform"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/photoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:elevation="12dp"
+        android:background="@color/scrim"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/patientPhoto"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="56dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            app:justifyContent="space_evenly"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/patientPhoto">
+
+            <ImageButton
+                android:layout_width="64dp"
+                android:id="@+id/rotateLeftButton"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/orange"
+                android:src="@drawable/icon_rotate_left" />
+
+            <ImageButton
+                android:layout_width="64dp"
+                android:id="@+id/rotateRightButton"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/orange"
+                android:src="@drawable/icon_rotate_right" />
+
+            <ImageButton
+                android:layout_width="64dp"
+                android:id="@+id/confirmPhotoButton"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/orange"
+                android:src="@drawable/icon_tick" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/addRoot"
@@ -160,6 +222,21 @@
                 android:theme="@style/SpinnerTheme" />
 
         </RelativeLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/photoButton"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:drawableBottom="@drawable/icon_cam"
+            android:padding="12dp"
+            android:text="Photo"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@id/addButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/addGenderGroup" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

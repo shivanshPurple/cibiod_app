@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:rotation="45"
-            android:src="@drawable/icon_tick"
+            android:src="@drawable/icon_tick_45"
             app:layout_anchor="@id/bottomBarSettings"
             app:maxImageSize="32dp"
             app:shapeAppearanceOverlay="@style/FabDiamondOverlay" />

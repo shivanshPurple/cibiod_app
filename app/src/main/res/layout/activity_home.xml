@@ -28,7 +28,7 @@
                 app:scrimVisibleHeightTrigger="250dp">
 
                 <ImageView
-                    android:id="@+id/patientActivityImg"
+                    android:id="@+id/patientImg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="360dp"
-                    android:text="Recents"
+                    android:text="Recent Patients"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     app:layout_collapseMode="parallax" />

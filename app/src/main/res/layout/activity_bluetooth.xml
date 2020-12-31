@@ -12,10 +12,11 @@
     <include layout="@layout/fragment_upload_shower" />
 
     <View
-        android:id="@+id/scrim"
+        android:id="@+id/scrimBluetooth"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/transparent"
+        android:alpha="0"
+        android:background="@color/scrim"
         android:elevation="10dp" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

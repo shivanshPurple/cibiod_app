@@ -219,13 +219,13 @@ public class BluetoothActivity extends AppCompatActivity {
             TestObject test = (TestObject) getIntent().getSerializableExtra("testObject");
             downloadFromCloud(test);
             statusText.setText("DOWNLOADING FROM CLOUD");
-            fab.setImageResource(R.drawable.icon_tick);
+            fab.setImageResource(R.drawable.icon_tick_45);
         } else if (action != null) {
             if (action.equals("local")) {
                 patient = (PatientObject) getIntent().getSerializableExtra("patientObject");
                 fab.setOnClickListener(new UploadClickListener());
             } else if (action.equals("quickTest")) {
-                fab.setImageResource(R.drawable.icon_tick);
+                fab.setImageResource(R.drawable.icon_tick_45);
             }
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (bluetoothAdapter == null) {
@@ -271,12 +271,10 @@ public class BluetoothActivity extends AppCompatActivity {
     }
 
     private void changeScrimState(boolean toOpen) {
-        View view = findViewById(R.id.scrim);
+        View view = findViewById(R.id.scrimBluetooth);
         ObjectAnimator oa;
-        if (toOpen)
-            oa = ObjectAnimator.ofArgb(view, "backgroundColor", getColor(R.color.transparent), getColor(R.color.scrim));
-        else
-            oa = ObjectAnimator.ofArgb(view, "backgroundColor", getColor(R.color.scrim), getColor(R.color.transparent));
+        if (toOpen) oa = ObjectAnimator.ofArgb(view, "alpha", 0, 1);
+        else oa = ObjectAnimator.ofArgb(view, "alpha", 1, 0);
         oa.setDuration(300);
         oa.start();
     }
@@ -683,9 +681,9 @@ public class BluetoothActivity extends AppCompatActivity {
             ecgQ.clear();
         }
         try {
-            if(tempOs!=null) tempOs.close();
-            if(pcgOs!=null) pcgOs.close();
-            if(ecgOs!=null) ecgOs.close();
+            if (tempOs != null) tempOs.close();
+            if (pcgOs != null) pcgOs.close();
+            if (ecgOs != null) ecgOs.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

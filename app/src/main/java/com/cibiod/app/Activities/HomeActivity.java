@@ -172,7 +172,8 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
                         PatientObject temp = new PatientObject(postSnapshot.child("name").getValue().toString(),
                                 postSnapshot.getKey(),
                                 postSnapshot.child("gender").getValue().toString(),
-                                postSnapshot.child("age").getValue().toString());
+                                postSnapshot.child("age").getValue().toString(),
+                                postSnapshot.child("photo").getValue().toString());
                         updateAdapter(temp);
                     }
                 } else {
@@ -216,7 +217,8 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
                     final PatientObject temp = new PatientObject(dataSnapshot.child("name").getValue().toString(),
                             dataSnapshot.getKey(),
                             dataSnapshot.child("gender").getValue().toString(),
-                            dataSnapshot.child("age").getValue().toString());
+                            dataSnapshot.child("age").getValue().toString(),
+                            dataSnapshot.child("photo").getValue().toString());
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {

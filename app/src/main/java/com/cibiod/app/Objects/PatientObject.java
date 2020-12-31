@@ -1,24 +1,23 @@
 package com.cibiod.app.Objects;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class PatientObject implements Serializable {
     private String mName;
     private String mId;
     private String mGender;
     private String mAge;
+    private String mPhotoUrl;
 
-    public PatientObject(String name, String id, String gender, String age)
-    {
+    public PatientObject(String name, String id, String gender, String age, String photoUrl) {
         mName = name;
         mId = id;
         mGender = gender;
         mAge = age;
+        mPhotoUrl = photoUrl;
     }
 
-    public PatientObject getPatientDetails()
-    {
+    public PatientObject getPatientDetails() {
         return this;
     }
 
@@ -54,13 +53,12 @@ public class PatientObject implements Serializable {
         this.mAge = mAge;
     }
 
-    public static ArrayList<PatientObject> createTemp(int amount) {
-        ArrayList<PatientObject> patients = new ArrayList<PatientObject>();
-
-        for (int i = 1; i <= amount; i++) {
-            patients.add(new PatientObject("Person " + amount, Integer.toString(amount), "gender", "20"));
-        }
-
-        return patients;
+    public String getPhotoUrl() {
+        return mPhotoUrl;
     }
+
+    public void setmPhotoUrl(String mPhotoUrl) {
+        this.mPhotoUrl = mPhotoUrl;
+    }
+
 }
