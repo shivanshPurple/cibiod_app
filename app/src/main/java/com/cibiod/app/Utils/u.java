@@ -28,6 +28,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.cibiod.app.Activities.BluetoothActivity;
 import com.cibiod.app.Activities.HomeActivity;
+import com.cibiod.app.Activities.LogoActivity;
 import com.cibiod.app.Activities.SettingsActivity;
 import com.cibiod.app.CustomViews.CustomSpinner;
 import com.cibiod.app.R;
@@ -179,20 +180,26 @@ public class u {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.menuHome:
-                        if (!activity.getLocalClassName().equals("Activities.HomeActivity"))
-                            activity.startActivity(new Intent(activity, HomeActivity.class));
-                        break;
-                    case R.id.menuQuickTest:
-                        if (!activity.getLocalClassName().equals("Activities.BluetoothActivity"))
-                            activity.startActivity(new Intent(activity, BluetoothActivity.class).putExtra("from", "quickTest"));
-                        break;
-                    case R.id.menuSettings:
-                        if (!activity.getLocalClassName().equals("Activities.SettingsActivity"))
-                            activity.startActivity(new Intent(activity, SettingsActivity.class));
-                        break;
+                if (item.getItemId() == R.id.menuHome)
+                    if (!activity.getLocalClassName().equals("Activities.HomeActivity"))
+                        activity.startActivity(new Intent(activity, HomeActivity.class));
+
+                if (item.getItemId() == R.id.menuQuickTest)
+                    if (!activity.getLocalClassName().equals("Activities.BluetoothActivity"))
+                        activity.startActivity(new Intent(activity, BluetoothActivity.class).putExtra("from", "quickTest"));
+
+                if (item.getItemId() == R.id.menuSettings)
+                    if (!activity.getLocalClassName().equals("Activities.SettingsActivity"))
+                        activity.startActivity(new Intent(activity, SettingsActivity.class));
+
+                if (item.getItemId() == R.id.logoutSettings) {
+                    u.logout(activity);
+                    Intent intent = new Intent(activity, LogoActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    activity.startActivity(intent);
+                    activity.overridePendingTransition(R.anim.slideupfromdown, 0);
                 }
+
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return false;
             }
@@ -250,11 +257,11 @@ public class u {
     public static void setPref(Context context, String key, String value) {
         SharedPreferences prefs = context.getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(key,value);
+        editor.putString(key, value);
         editor.apply();
     }
 
-    public static void logout(Context context){
+    public static void logout(Context context) {
         SharedPreferences prefs = context.getSharedPreferences("applicationVariables", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove("id");

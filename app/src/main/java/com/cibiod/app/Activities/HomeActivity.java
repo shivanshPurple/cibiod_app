@@ -45,14 +45,13 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class HomeActivity extends AppCompatActivity implements RecyclerCallback {
     private DatabaseReference db;
-    private ArrayList<PatientObject> mPatients = new ArrayList<>();
+    private final ArrayList<PatientObject> mPatients = new ArrayList<>();
     private PatientAdapter recyclerAdapter;
 
     private AppBarLayout appBarLayout;
@@ -152,7 +151,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.searchView) {
             TransitionManager.beginDelayedTransition((ViewGroup) findViewById(R.id.toolbarHome));
-            MenuItemCompat.expandActionView(item);
+            item.expandActionView();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -183,7 +182,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getApplicationContext(), "Firebase Connection Error", Toast.LENGTH_LONG).show();
             }
         });

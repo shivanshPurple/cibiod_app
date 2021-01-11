@@ -99,7 +99,8 @@ public class BluetoothActivity extends AppCompatActivity {
             pcgFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/pcgFile.txt"),
             ecgFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/ecgFile.txt"),
             tempFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/tempFile.txt"),
-            zipFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/audioZip.zip");
+            zipFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/audioZip.zip"),
+            folder = new File(Environment.getExternalStorageDirectory() + "/Cibiod/");
     private BluetoothAdapter bluetoothAdapter;
     private PatientObject patient;
     private AudioTrack at;
@@ -183,6 +184,11 @@ public class BluetoothActivity extends AppCompatActivity {
         batteryText = findViewById(R.id.batteryLvl);
         dataLossText = findViewById(R.id.dataLoss);
         FloatingActionButton fab = findViewById(R.id.fabTest);
+
+        if(!folder.exists()){
+            u.print("folder does not exists, making the folder");
+            folder.mkdir();
+        }
 
         try {
             pcgOs = new FileOutputStream(pcgFile);
@@ -401,15 +407,15 @@ public class BluetoothActivity extends AppCompatActivity {
                     at.play();
                     audioStartTime = System.currentTimeMillis();
                     while (true) {
-                        int elapsed = (int) (System.currentTimeMillis() - audioStartTime) / 100;
-                        int mins = Math.max(elapsed / 60, 0);
-                        int secs = Math.max(elapsed % 60, 0);
-                        final String minutes = mins < 10 ? "0" + mins : String.valueOf(mins);
-                        final String seconds = secs < 10 ? "0" + secs : String.valueOf(secs);
 
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                int elapsed = (int) (System.currentTimeMillis() - audioStartTime) / 100;
+                                int mins = Math.max(elapsed / 60, 0);
+                                int secs = Math.max(elapsed % 60, 0);
+                                String minutes = mins < 10 ? "0" + mins : String.valueOf(mins);
+                                String seconds = secs < 10 ? "0" + secs : String.valueOf(secs);
                                 statusText.setText(minutes + ":" + seconds);
                                 if (pcgQ.size() > 0)
                                     pcgSeries.appendData(new DataPoint(i * 16, pcgQ.remove()), true, 100000);
@@ -493,7 +499,6 @@ public class BluetoothActivity extends AppCompatActivity {
         };
 
         threads[1].start();
-
     }
 
     private void decodeDcip() {

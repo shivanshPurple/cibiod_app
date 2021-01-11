@@ -1,12 +1,11 @@
 package com.cibiod.app.Activities;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,7 +24,6 @@ import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -48,10 +46,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,11 +58,6 @@ public class ForumActivity extends AppCompatActivity {
     private ImageView closeIcon;
     private String pictureImagePath;
     private Button addButton;
-
-    private int rotationToBeDone = 0;
-    private boolean rotating;
-    private volatile boolean rotationDone = false;
-    private CountDownLatch latch = new CountDownLatch(1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +85,7 @@ public class ForumActivity extends AppCompatActivity {
 
         u.setupDropdown(this, genderDropdown, R.array.Gender, genderPopupBg, genderDropdownArrow);
 
-        ObjectAnimator oa = ObjectAnimator.ofFloat(findViewById(R.id.addRoot), "alpha", 0, 1).setDuration(300);
+        ObjectAnimator oa = ObjectAnimator.ofFloat(findViewById(R.id.rootView), "alpha", 0, 1).setDuration(300);
         oa.setStartDelay(1000);
         oa.setInterpolator(new AccelerateInterpolator());
         oa.start();
@@ -159,7 +149,8 @@ public class ForumActivity extends AppCompatActivity {
                 final Query idGetter = dbRef.child(u.getPref(ForumActivity.this, "id")).child("patients").limitToLast(1).orderByKey();
 
                 addButton.setClickable(false);
-                ObjectAnimator.ofFloat(addButton, "alpha", 1, 0).setDuration(300).start();
+                ObjectAnimator.ofFloat(findViewById(R.id.rootView), "alpha", 1, 0).setDuration(300).start();
+                ObjectAnimator.ofFloat(findViewById(R.id.loadingShower),"alpha",0,1).setDuration(300).start();
 
                 idGetter.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -224,13 +215,14 @@ public class ForumActivity extends AppCompatActivity {
 
         final String finalName = name;
 
-        latch.await();
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Toast.makeText(ForumActivity.this, "Failed, Try again later!", Toast.LENGTH_LONG).show();
+
                 addButton.setClickable(true);
-                ObjectAnimator.ofFloat(addButton, "alpha", 0, 1).setDuration(300).start();
+                ObjectAnimator.ofFloat(findViewById(R.id.rootView), "alpha", 0, 1).setDuration(300).start();
+                ObjectAnimator.ofFloat(findViewById(R.id.loadingShower),"alpha",1,0).setDuration(300).start();
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -266,10 +258,8 @@ public class ForumActivity extends AppCompatActivity {
     private void getPhoto() {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = timeStamp + ".jpg";
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        pictureImagePath = storageDir.getAbsolutePath() + "/" + imageFileName;
+        pictureImagePath = storageDir.getAbsolutePath() + "/patientTempPic.jpg";
         File file = new File(pictureImagePath);
         Uri outputFileUri = Uri.fromFile(file);
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -283,114 +273,61 @@ public class ForumActivity extends AppCompatActivity {
         if (requestCode == 90 && resultCode == RESULT_OK) {
             File imgFile = new File(pictureImagePath);
             if (imgFile.exists()) {
-                final Bitmap imageBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                Bitmap imageBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                imageBitmap = correctRotation(imageBitmap);
+
+                try (FileOutputStream out = new FileOutputStream(pictureImagePath)) {
+                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 15, out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 final ImageView image = findViewById(R.id.patientPhoto);
                 image.setImageBitmap(imageBitmap);
 
-                final View layout = findViewById(R.id.photoLayout);
-                layout.setAlpha(1);
+                final ObjectAnimator oa1 = ObjectAnimator.ofFloat(image, "scaleX", 1, 0.5f).setDuration(300);
+                final ObjectAnimator oa2 = ObjectAnimator.ofFloat(image, "scaleY", 1, 0.5f).setDuration(300);
+                final ObjectAnimator oa3 = ObjectAnimator.ofFloat(image, "alpha", 1, 0).setDuration(300);
 
-                rotating = false;
-
-                ImageButton rotateLeft = findViewById(R.id.rotateLeftButton);
-                rotateLeft.setOnClickListener(new View.OnClickListener() {
+                new Handler().postDelayed(new Runnable() {
                     @Override
-                    public void onClick(View v) {
-                        if (!rotating) {
-                            rotating = true;
-                            ObjectAnimator oa;
-                            oa = ObjectAnimator.ofFloat(image, "rotation", image.getRotation(), image.getRotation() - 90).setDuration(300);
-                            oa.start();
-                            oa.addListener(new Animator.AnimatorListener() {
-                                @Override
-                                public void onAnimationStart(Animator animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    rotating = false;
-                                }
-
-                                @Override
-                                public void onAnimationCancel(Animator animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationRepeat(Animator animation) {
-
-                                }
-                            });
-                            rotationToBeDone -= 90;
-                        }
+                    public void run() {
+                        oa1.start();
+                        oa2.start();
+                        oa3.start();
                     }
-                });
-
-                ImageButton rotateRight = findViewById(R.id.rotateRightButton);
-
-                rotateRight.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (!rotating) {
-                            rotating = true;
-                            ObjectAnimator oa;
-                            oa = ObjectAnimator.ofFloat(image, "rotation", image.getRotation(), image.getRotation() + 90).setDuration(300);
-                            oa.start();
-                            oa.addListener(new Animator.AnimatorListener() {
-                                @Override
-                                public void onAnimationStart(Animator animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    rotating = false;
-                                }
-
-                                @Override
-                                public void onAnimationCancel(Animator animation) {
-
-                                }
-
-                                @Override
-                                public void onAnimationRepeat(Animator animation) {
-
-                                }
-                            });
-                            rotationToBeDone += 90;
-                        }
-                    }
-                });
-
-                ImageButton confirmPhoto = findViewById(R.id.confirmPhotoButton);
-                confirmPhoto.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ObjectAnimator.ofFloat(layout, "alpha", 1, 0).setDuration(300).start();
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Bitmap finalImg = RotateBitmap(imageBitmap, rotationToBeDone);
-                                try (FileOutputStream out = new FileOutputStream(pictureImagePath)) {
-                                    finalImg.compress(Bitmap.CompressFormat.PNG, 100, out);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                rotationDone = true;
-                                latch.countDown();
-                            }
-                        }).start();
-                    }
-                });
-
+                }, 2000);
             } else {
                 Toast.makeText(ForumActivity.this, "Can not detect photo!", Toast.LENGTH_LONG).show();
             }
         }
     }
+
+    private Bitmap correctRotation(Bitmap imageBitmap) {
+        try {
+            ExifInterface ei = new ExifInterface(pictureImagePath);
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+            switch (orientation) {
+
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    imageBitmap = RotateBitmap(imageBitmap, 90);
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    imageBitmap = RotateBitmap(imageBitmap, 180);
+                    break;
+
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    imageBitmap = RotateBitmap(imageBitmap, 270);
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return imageBitmap;
+    }
+
 
     public static Bitmap RotateBitmap(Bitmap source, float angle) {
         Matrix matrix = new Matrix();

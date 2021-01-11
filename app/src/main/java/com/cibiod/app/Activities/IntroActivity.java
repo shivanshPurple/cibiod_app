@@ -39,7 +39,8 @@ public class IntroActivity extends AppCompatActivity implements GestureDetector.
     private String current = "bluetooth";
     private boolean animating = false;
 
-    private float minSwipeAmt = 0.8f, maxSwipeDist = 500;
+    private final float minSwipeAmt = 0.8f;
+    private final float maxSwipeDist = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -32,8 +32,8 @@ public class GraphView extends HorizontalScrollView {
     private double graphXOffset = 0.75;//X position to start plotting
     private int timeScale = 5 * 1000;//Put time marker for every 5 sec
     private int maxAmplitude = 35000;//Maximum possible amplitude
-    private double defaultWaveLength = 2.6;//default sine wave length
-    private int timeMarkerSize = 50;
+    private final double defaultWaveLength = 2.6;//default sine wave length
+    private final int timeMarkerSize = 50;
     private boolean drawFullGraph = false;
     private GraphSurfaceView graphSurfaceView;
     private List<WaveSample> pointList;

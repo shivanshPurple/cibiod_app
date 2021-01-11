@@ -19,7 +19,7 @@
         app:lottie_fileName="downloading_anim.json"
         app:lottie_loop="true"
         app:lottie_repeatMode="reverse"
-        app:lottie_speed="0.7"
+        app:lottie_speed="0.9"
         app:tint="#CCFFFFFF" />
 
     <TextView

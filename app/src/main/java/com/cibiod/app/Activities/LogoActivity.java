@@ -123,6 +123,9 @@ public class LogoActivity extends AppCompatActivity implements GestureDetector.O
                 Toast.makeText(this, "Permissions required fpr app to work!", Toast.LENGTH_LONG).show();
                 requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, ACCESS_FINE_LOCATION, INTERNET, BLUETOOTH, BLUETOOTH_ADMIN}, 12);
             }
+            if (resultCode == RESULT_OK){
+
+            }
         }
     }
 

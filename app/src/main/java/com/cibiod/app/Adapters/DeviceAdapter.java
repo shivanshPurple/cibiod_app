@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>
 {
-    private List<BluetoothDeviceObject> devices;
-    private RecyclerCallback mRecyclerCallback;
+    private final List<BluetoothDeviceObject> devices;
+    private final RecyclerCallback mRecyclerCallback;
 
     public DeviceAdapter(List<BluetoothDeviceObject> tempDevices, RecyclerCallback recyclerCallbackVar) {
         devices = tempDevices;

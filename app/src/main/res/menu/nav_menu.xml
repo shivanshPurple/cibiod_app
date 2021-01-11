@@ -16,4 +16,9 @@
         android:icon="@drawable/icon_setting"
         android:title="Settings" />
 
+    <item
+        android:id="@+id/logoutSettings"
+        android:icon="@drawable/icon_logout"
+        android:title="Logout" />
+
 </menu>
