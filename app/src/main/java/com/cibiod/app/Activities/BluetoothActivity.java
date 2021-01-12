@@ -15,6 +15,7 @@ import android.media.AudioTrack;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,6 +77,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -94,6 +96,7 @@ import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 public class BluetoothActivity extends AppCompatActivity {
     final protected static char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
     private final File audioFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/PCG.wav"),
             dataFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/data.txt"),
             pcgFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/pcgFile.txt"),
@@ -101,6 +104,7 @@ public class BluetoothActivity extends AppCompatActivity {
             tempFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/tempFile.txt"),
             zipFile = new File(Environment.getExternalStorageDirectory() + "/Cibiod/audioZip.zip"),
             folder = new File(Environment.getExternalStorageDirectory() + "/Cibiod/");
+
     private BluetoothAdapter bluetoothAdapter;
     private PatientObject patient;
     private AudioTrack at;
@@ -185,7 +189,7 @@ public class BluetoothActivity extends AppCompatActivity {
         dataLossText = findViewById(R.id.dataLoss);
         FloatingActionButton fab = findViewById(R.id.fabTest);
 
-        if(!folder.exists()){
+        if (!folder.exists()) {
             u.print("folder does not exists, making the folder");
             folder.mkdir();
         }
@@ -398,8 +402,18 @@ public class BluetoothActivity extends AppCompatActivity {
 
 //        plotting graph thread, plots graph from queue of loaded data
 
-        if (!plotting & pcgQ.size() > 200) {
+        if (pcgQ.size() <= 500) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    statusText.setText("BUFFERING DATA " + (int) (pcgQ.size() / 5));
+                }
+            });
+        }
+
+        if (!plotting & pcgQ.size() > 500) {
             plotting = true;
+            u.print("plotting started");
             threads[2] = new Thread() {
                 @Override
                 public void run() {
@@ -407,25 +421,24 @@ public class BluetoothActivity extends AppCompatActivity {
                     at.play();
                     audioStartTime = System.currentTimeMillis();
                     while (true) {
+                        int elapsed = (int) (System.currentTimeMillis() - audioStartTime) / 1000;
+                        int mins = Math.max(elapsed / 60, 0);
+                        int secs = Math.max(elapsed % 60, 0);
+                        final String minutes = mins < 10 ? "0" + mins : String.valueOf(mins);
+                        final String seconds = secs < 10 ? "0" + secs : String.valueOf(secs);
 
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                int elapsed = (int) (System.currentTimeMillis() - audioStartTime) / 100;
-                                int mins = Math.max(elapsed / 60, 0);
-                                int secs = Math.max(elapsed % 60, 0);
-                                String minutes = mins < 10 ? "0" + mins : String.valueOf(mins);
-                                String seconds = secs < 10 ? "0" + secs : String.valueOf(secs);
                                 statusText.setText(minutes + ":" + seconds);
+
                                 if (pcgQ.size() > 0)
-                                    pcgSeries.appendData(new DataPoint(i * 16, pcgQ.remove()), true, 100000);
+                                    pcgSeries.appendData(new DataPoint(i * 16, pcgQ.remove()), true, 1000000000);
                                 if (ecgQ.size() > 0)
-                                    ecgSeries.appendData(new DataPoint(i * 16, ecgQ.remove()), true, 100000);
+                                    ecgSeries.appendData(new DataPoint(i * 16, ecgQ.remove()), true, 1000000000);
                             }
                         });
                         i++;
-                        if (i > 10000)
-                            break;
                         try {
                             Thread.sleep(16);
                         } catch (InterruptedException e) {
@@ -434,7 +447,6 @@ public class BluetoothActivity extends AppCompatActivity {
                     }
                 }
             };
-
             threads[2].start();
         }
     }
@@ -487,8 +499,7 @@ public class BluetoothActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (dataBuffer.length() >= 12)
-                                    decodeDcip();
+                                if (dataBuffer.length() >= 12) decodeDcip();
                             }
                         });
                     }
@@ -504,7 +515,6 @@ public class BluetoothActivity extends AppCompatActivity {
     private void decodeDcip() {
         while (dataBuffer.length() >= 12) {
             String data = dataBuffer.toString();
-
             if (data.startsWith("02C306")) {
                 if (data.length() >= 18) {
                     if (isChecksumOk(data.substring(0, 16), data.substring(16, 18))) {
@@ -728,19 +738,19 @@ public class BluetoothActivity extends AppCompatActivity {
         ObjectAnimator oa = ObjectAnimator.ofFloat(content, "alpha", 1, 0).setDuration(200);
         ObjectAnimator oa2 = ObjectAnimator.ofFloat(bg, "scaleX", 0, 30).setDuration(600);
         ObjectAnimator oa3 = ObjectAnimator.ofFloat(bg, "scaleY", 0, 30).setDuration(600);
-        as.playTogether(oa, oa2, oa3);
-        as.setInterpolator(new DecelerateInterpolator());
-        as.start();
-
         ConstraintLayout layout = findViewById(R.id.loadingShower);
         ObjectAnimator oa4 = ObjectAnimator.ofFloat(layout, "alpha", 0, 1).setDuration(600);
         oa4.setStartDelay(600);
         oa4.setInterpolator(new DecelerateInterpolator());
-        oa4.start();
+        as.playTogether(oa, oa2, oa3, oa4);
+        as.setInterpolator(new DecelerateInterpolator());
+        as.start();
+
         getWindow().setStatusBarColor(getColor(R.color.orangeDark));
     }
 
     private void decideIdAndAddToDb(final String url) {
+        u.print("uploaded");
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         final DatabaseReference dbRef = database.getReference("users");
@@ -773,7 +783,8 @@ public class BluetoothActivity extends AppCompatActivity {
     }
 
     private void addToDb(String url, String id, FirebaseDatabase database) {
-        DatabaseReference db = database.getReference("users").child(id).child("patients").child(patient.getId()).child(id);
+        u.print(url);
+        DatabaseReference db = database.getReference("users").child(u.getPref(this, "id")).child("patients").child(patient.getId()).child(id);
 
         Date date = new Date();
         DateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
@@ -781,13 +792,13 @@ public class BluetoothActivity extends AppCompatActivity {
         LocalTime time = LocalTime.now();
         String strTime = time.format(DateTimeFormatter.ofPattern("HH:mm"));
 
-
         db.child("date").setValue(strDate);
         db.child("time").setValue(strTime);
         db.child("data").setValue(url).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Toast.makeText(BluetoothActivity.this, "Added to Database", Toast.LENGTH_LONG).show();
+                u.print("added to database");
                 BluetoothActivity.this.finish();
             }
         });
@@ -796,26 +807,39 @@ public class BluetoothActivity extends AppCompatActivity {
     private class UploadClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
+            ObjectAnimator.ofFloat(v, "alpha", 1, 0).setDuration(300).start();
+            v.setClickable(false);
             showLoading();
             at.pause();
-//            if(pcgQ!=null)
-//                pcgQ.clear();
-//            if(receiveDataThread!=null)
-//                receiveDataThread.interrupt();
-//            try {
-//                ArrayList<String> lines = formatValues();
-//
-//                FileOutputStream dataOs = new FileOutputStream(dataFile);
-//                for (String s : lines)
-//                    dataOs.write(s.getBytes());
-//
-//                dataOs.close();
+            if (threads[1] != null)
+                threads[1].interrupt();
+            if (threads[0] != null)
+                threads[0].interrupt();
+            if (threads[2] != null)
+                threads[2].interrupt();
 
-            uploadToCloud();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        u.print("formatting values");
+                        ArrayList<String> lines = formatValues();
+                        FileOutputStream dataOs = new FileOutputStream(dataFile);
+                        u.print(lines.size());
+                        for (String s : lines)
+                            dataOs.write(s.getBytes());
 
+                        dataOs.flush();
+                        dataOs.close();
+                        u.print("file is ready");
+
+                        uploadToCloud();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
 
         private ArrayList<String> formatValues() throws FileNotFoundException {
@@ -844,17 +868,19 @@ public class BluetoothActivity extends AppCompatActivity {
             StorageReference storageRef = storage.getReference();
 
             Uri file = Uri.fromFile(dataFile);
-            final StorageReference dataFileRef = storageRef.child("data/patientId_" + patient.getId() + ".txt");
+            final StorageReference dataFileRef = storageRef.child("data").child("patientId_" + patient.getId() + new Random().nextInt() + ".txt");
             UploadTask uploadTask = dataFileRef.putFile(file);
 
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
-                    Toast.makeText(BluetoothActivity.this, "Failed to upload to database", Toast.LENGTH_LONG).show();
+                    Toast.makeText(BluetoothActivity.this, "Failed to upload to database " + exception.toString(), Toast.LENGTH_LONG).show();
+                    BluetoothActivity.this.finish();
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    u.print("getting url");
                     dataFileRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri downloadUrl) {
@@ -863,7 +889,7 @@ public class BluetoothActivity extends AppCompatActivity {
                     });
                 }
             });
-
+            u.print("uploading..");
         }
     }
 

@@ -249,10 +249,14 @@ public class HomeActivity extends AppCompatActivity implements RecyclerCallback 
 
     @Override
     public void onItemClick(int pos, View card) {
-        Intent intent = new Intent(this, PatientActivity.class);
-        intent.putExtra("patientObject", mPatients.get(pos));
-        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this, card, "patientContainer");
-        startActivity(intent, options.toBundle());
+        try {
+            Intent intent = new Intent(this, PatientActivity.class);
+            intent.putExtra("patientObject", mPatients.get(pos));
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this, card, "patientContainer");
+            startActivity(intent, options.toBundle());
+        } catch (Exception e){
+            u.print(e.toString());
+        }
     }
 
     @Override
