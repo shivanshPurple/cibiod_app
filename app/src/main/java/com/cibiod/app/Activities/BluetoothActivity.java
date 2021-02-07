@@ -58,6 +58,7 @@ import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.scichart.charting.visuals.axes.IAxis;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -133,6 +134,8 @@ public class BluetoothActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.cutom_toolbar);
+
+
 
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayoutTest);
         NavigationView navigationView = findViewById(R.id.navViewPatient);

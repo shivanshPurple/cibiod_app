@@ -100,14 +100,20 @@ public class BottomSheetBluetoothDevice extends BottomSheetDialogFragment implem
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            u.print(action);
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
                 progressView.start();
             if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))
                 bluetoothAdapter.startDiscovery();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 android.bluetooth.BluetoothDevice device = intent.getParcelableExtra(android.bluetooth.BluetoothDevice.EXTRA_DEVICE);
-                devices.add(new BluetoothDeviceObject(device.getName(), device.getAddress()));
+                boolean already = false;
+                for (BluetoothDeviceObject d : devices)
+                    if (d.getAddress().equals(device.getAddress())) {
+                        already = true;
+                        break;
+                    }
+                if (!already)
+                    devices.add(new BluetoothDeviceObject(device.getName(), device.getAddress()));
                 updateList();
             }
         }
