@@ -6,7 +6,7 @@
     android:id="@+id/drawerLayoutSettings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_screen_without_collapsingtoolbar">
+    android:background="@drawable/bg_screen_without_collapsing_toolbar">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -16,6 +16,7 @@
             android:id="@+id/fabSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/saveSettingsButtonDesc"
             android:rotation="45"
             android:src="@drawable/icon_tick_45"
             app:layout_anchor="@id/bottomBarSettings"
@@ -37,7 +38,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".Activities.BluetoothActivity">
+        tools:context=".activities.BluetoothActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarSettings"
@@ -52,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Volume"
+            android:text="@string/volumeText"
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -92,7 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="App Info"
+            android:text="@string/appInfoText"
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -120,7 +121,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
-                    android:text="Version"
+                    android:text="@string/versionText"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
@@ -129,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
-                    android:text="Publisher"
+                    android:text="@string/publisherText"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
@@ -138,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
-                    android:text="Developer"
+                    android:text="@string/developerText"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -155,14 +156,15 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
-                    android:text="V1"
+                    android:text="@string/versionCodeText"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:id="@+id/cibiodLink"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    tools:ignore="UseCompoundDrawables">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -176,6 +178,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="@string/publisherButtonDesc"
                         android:scaleX="0.8"
                         android:scaleY="0.8"
                         android:src="@drawable/icon_open_url"
@@ -186,7 +189,8 @@
                 <LinearLayout
                     android:id="@+id/purpleLink"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    tools:ignore="UseCompoundDrawables">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -200,6 +204,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="@string/devContactButtonDesc"
                         android:scaleX="0.8"
                         android:scaleY="0.8"
                         android:src="@drawable/icon_open_url"
@@ -246,7 +251,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="SomeDevice"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -256,6 +260,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/changePairedDeviceButtonDesc"
                 android:src="@drawable/icon_open_url"
                 app:layout_constraintBottom_toBottomOf="@+id/changeDeviceText"
                 app:layout_constraintStart_toEndOf="@+id/changeDeviceText"
@@ -287,7 +292,7 @@
             android:drawableBottom="@drawable/icon_logout"
             android:drawableTint="@color/black"
             android:padding="16dp"
-            android:text="Logout"
+            android:text="@string/logoutButtonDesc"
             android:textAllCaps="false"
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"

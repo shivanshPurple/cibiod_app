@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cibiod.app">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.cibiod2.estetho"
+    android:versionCode="2"
+    android:versionName="Closed">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -8,9 +11,13 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
 
     <application
@@ -19,16 +26,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/DefaultTheme"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".Activities.IntroActivity" />
-        <activity android:name=".Activities.BluetoothActivity" />
-        <activity android:name=".Activities.ForumActivity" />
-        <activity android:name=".Activities.PatientActivity" />
-        <activity android:name=".Activities.LoginActivity" />
-        <activity android:name=".Activities.HomeActivity" />
-        <activity android:name=".Activities.RegisterActivity" />
-        <activity android:name=".Activities.SettingsActivity" />
-        <activity android:name=".Activities.LogoActivity">
+        android:usesCleartextTraffic="true"
+        android:fullBackupContent="@xml/backup_descriptor"
+        android:allowBackup="true"
+        tools:ignore="AllowBackup">
+        <activity android:name="com.cibiod2.estetho.activities.IntroActivity" />
+        <activity
+            android:name="com.cibiod2.estetho.activities.BluetoothActivity"
+            android:hardwareAccelerated="true" />
+        <activity android:name="com.cibiod2.estetho.activities.ForumActivity" />
+        <activity android:name="com.cibiod2.estetho.activities.PatientActivity" />
+        <activity android:name="com.cibiod2.estetho.activities.LoginActivity" />
+        <activity android:name="com.cibiod2.estetho.activities.HomeActivity" />
+        <activity android:name="com.cibiod2.estetho.activities.RegisterActivity" />
+        <activity android:name="com.cibiod2.estetho.activities.SettingsActivity" />
+        <activity android:name="com.cibiod2.estetho.activities.LogoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

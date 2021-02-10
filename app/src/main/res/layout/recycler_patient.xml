@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/patientCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
     android:layout_marginBottom="16dp"
-    android:transitionName="patientContainer"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/selectableItemBackgroundBorderless"
-    android:id="@+id/patientCard"
-    app:cardElevation="2dp"
-    app:cardCornerRadius="25dp">
+    android:transitionName="patientContainer"
+    app:cardCornerRadius="25dp"
+    app:cardElevation="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -23,9 +24,10 @@
             android:layout_height="90dp"
             android:layout_marginStart="8dp"
             android:background="@color/transparent"
-            android:transitionName="patientSharedImg"
+            android:importantForAccessibility="no"
             android:paddingBottom="8dp"
             android:scaleType="centerInside"
+            android:transitionName="patientSharedImg"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/vector_patient_male" />
@@ -42,7 +44,8 @@
             app:layout_constraintEnd_toStartOf="@+id/textView5"
             app:layout_constraintHorizontal_bias="0.38"
             app:layout_constraintStart_toEndOf="@+id/imgAdapter"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/textView5"
@@ -55,7 +58,8 @@
             android:textAlignment="textEnd"
             android:textColor="@color/grey"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/idAdapter"
@@ -68,7 +72,8 @@
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="@+id/textView5"
             app:layout_constraintStart_toStartOf="@+id/textView5"
-            app:layout_constraintTop_toTopOf="@+id/textView5" />
+            app:layout_constraintTop_toTopOf="@+id/textView5"
+            tools:ignore="HardcodedText,SmallSp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

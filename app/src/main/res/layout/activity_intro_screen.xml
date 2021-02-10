@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/orange"
-    tools:context=".Activities.IntroActivity" >
+    tools:context=".activities.IntroActivity">
 
     <ImageView
         android:id="@+id/circle1white"
@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="16dp"
+        android:importantForAccessibility="no"
         android:scaleX="0.8"
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -26,6 +27,7 @@
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="16dp"
         android:alpha="0"
+        android:importantForAccessibility="no"
         android:scaleX="0.8"
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -38,6 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
+        android:importantForAccessibility="no"
         android:scaleX="0.8"
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -51,6 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:alpha="0"
+        android:importantForAccessibility="no"
         android:scaleX="0.8"
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -65,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="16dp"
+        android:importantForAccessibility="no"
         android:scaleX="0.8"
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,6 +83,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginBottom="16dp"
         android:alpha="0"
+        android:importantForAccessibility="no"
         android:scaleX="0.8"
         android:scaleY="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -102,7 +108,7 @@
             android:layout_marginTop="16dp"
             android:fontFamily="@font/roboto_black"
             android:letterSpacing="0.05"
-            android:text="WIRELESS \nTECHNOLOGY"
+            android:text="@string/wirelessTechnologyText"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="33sp"
@@ -111,14 +117,13 @@
             app:layout_constraintTop_toBottomOf="@+id/bluetoothVector" />
 
         <TextView
-            android:id="@+id/bluetoothDesc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="32dp"
             android:fontFamily="sans-serif-light"
-            android:text="Use our device to reduce  the hassle of  wires or getting in contact with someone.  Your phone will connect automatically to the  device while you are examining someone.  No need to worry about pairing and  connecting to the device."
+            android:text="@string/wirelessTechnologyDescText"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="normal"
@@ -136,7 +141,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="true"
             app:lottie_fileName="bluetooth_anim.json"
-            app:lottie_loop="true"/>
+            app:lottie_loop="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -157,7 +162,7 @@
             android:layout_marginTop="32dp"
             android:fontFamily="@font/roboto_black"
             android:letterSpacing="0.05"
-            android:text="CLOUD \nSTORAGE"
+            android:text="@string/cloudStorageText"
             android:textColor="@color/white"
             android:textSize="33sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -165,14 +170,13 @@
             app:layout_constraintTop_toBottomOf="@+id/cloudVector" />
 
         <TextView
-            android:id="@+id/cloudDesc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="32dp"
             android:fontFamily="sans-serif-light"
-            android:text="Every test you take will automatically save itself on our cloud services , so you can manage them for later. These tests may also be used to train algorithms which can help you get more out of every analysis."
+            android:text="@string/cloudStorageDescText"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="normal"
@@ -190,7 +194,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="true"
             app:lottie_fileName="cloud_anim.json"
-            app:lottie_loop="true"/>
+            app:lottie_loop="true" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -209,7 +213,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_black"
             android:letterSpacing="0.05"
-            android:text="IN APP \nPROCESSING"
+            android:text="@string/inAppProcessingText"
             android:textColor="@color/white"
             android:textSize="33sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -217,14 +221,13 @@
             app:layout_constraintTop_toBottomOf="@+id/inAppVector" />
 
         <TextView
-            android:id="@+id/inAppDesc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="32dp"
             android:fontFamily="sans-serif-light"
-            android:text="Our app provides in-app processing features like filtering to pick up heart or lung sounds individually. It can also export every PCG file as a WAV file for sharing purposes."
+            android:text="@string/inAppProcessingDescText"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="normal"
@@ -241,16 +244,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="true"
-            app:lottie_repeatMode="reverse"
-            app:lottie_speed="0.75"
             app:lottie_fileName="processing_anim.json"
-            app:lottie_loop="true"/>
+            app:lottie_loop="true"
+            app:lottie_repeatMode="reverse"
+            app:lottie_speed="0.75" />
 
         <Button
             android:id="@+id/introButton"
             style="@style/ButtonTheme"
             android:layout_marginBottom="64dp"
-            android:text="START"
+            android:text="@string/startButton"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

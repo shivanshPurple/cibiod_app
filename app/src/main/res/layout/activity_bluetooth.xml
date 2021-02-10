@@ -4,10 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawerLayoutTest"
-    android:transitionName="testContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_screen_without_collapsingtoolbar">
+    android:background="@drawable/bg_screen_without_collapsing_toolbar"
+    android:transitionName="testContainer">
 
     <include layout="@layout/fragment_upload_shower" />
 
@@ -21,18 +21,19 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabTest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/fabTest"
+            android:contentDescription="@string/uploadButtonDesc"
             android:rotation="45"
             android:src="@drawable/icon_cloud"
-            app:maxImageSize="32dp"
             app:layout_anchor="@id/bottomBarTest"
-            app:shapeAppearanceOverlay="@style/FabDiamondOverlay"/>
+            app:maxImageSize="32dp"
+            app:shapeAppearanceOverlay="@style/FabDiamondOverlay" />
 
         <ImageView
             android:id="@+id/fabBgBluetooth"
@@ -41,31 +42,32 @@
             android:layout_gravity="end|bottom"
             android:background="@drawable/fab_shape"
             android:elevation="6dp"
-            android:translationZ="6dp"
+            android:importantForAccessibility="no"
             android:scaleX="0"
             android:scaleY="0"
             android:src="@drawable/fab_shape"
             android:transitionName="containerTransformFragment"
             android:translationX="8dp"
             android:translationY="8dp"
+            android:translationZ="6dp"
             app:layout_anchor="@id/fabTest" />
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/bottomBarTest"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:backgroundTint="@color/blue"
             app:fabCradleMargin="24dp"
-            app:hideOnScroll="true"
             app:fabCradleVerticalOffset="8dp"
-            android:layout_gravity="bottom" />
+            app:hideOnScroll="true" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contentBluetooth"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/contentBluetooth"
-        tools:context=".Activities.BluetoothActivity">
+        tools:context=".activities.BluetoothActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarTest"
@@ -75,19 +77,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.jjoe64.graphview.GraphView
-            android:id="@+id/graphViewEcg"
+        <com.cibiod2.estetho.customViews.PurpleGraph
+            android:id="@+id/pcgGraph"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
+            android:layout_marginTop="32dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="250dp">
+            app:layout_constraintTop_toBottomOf="@id/toolbarTest"
+            tools:layout_editor_absoluteY="250dp" />
 
-        </com.jjoe64.graphview.GraphView>
+        <com.cibiod2.estetho.customViews.PurpleGraph
+            android:id="@+id/ecgGraph"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pcgGraph"
+            tools:layout_editor_absoluteY="250dp" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout2"
@@ -96,12 +104,12 @@
             android:layout_marginStart="48dp"
             android:layout_marginTop="72dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/graphViewEcg">
+            app:layout_constraintTop_toBottomOf="@+id/ecgGraph">
 
             <ImageView
-                android:id="@+id/imageView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
                 android:src="@drawable/bg_test_textview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -114,12 +122,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:text="HEART\nRATE"
+                android:text="@string/heartRateText"
                 android:textColor="@color/blue"
                 android:textSize="8sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SmallSp" />
 
             <TextView
                 android:id="@+id/heartrate"
@@ -143,6 +152,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
                 android:src="@drawable/bg_test_textview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -155,12 +165,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:text="BATTERY\nLEVEL"
+                android:text="@string/batteryText"
                 android:textColor="@color/blue"
                 android:textSize="8sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SmallSp" />
 
             <TextView
                 android:id="@+id/batteryLvl"
@@ -180,12 +191,12 @@
             android:layout_marginTop="72dp"
             android:layout_marginEnd="48dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/graphViewEcg">
+            app:layout_constraintTop_toBottomOf="@+id/ecgGraph">
 
             <ImageView
-                android:id="@+id/imageView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
                 android:src="@drawable/bg_test_textview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -198,12 +209,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:text="BODY\nTEMPERATURE"
+                android:text="@string/temperatureText"
                 android:textColor="@color/blue"
                 android:textSize="8sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SmallSp" />
 
             <TextView
                 android:id="@+id/temp"
@@ -227,6 +239,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:importantForAccessibility="no"
                 android:src="@drawable/bg_test_textview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -239,12 +252,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:text="DATA\nLOSS"
+                android:text="@string/dataLossText"
                 android:textColor="@color/blue"
                 android:textSize="8sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SmallSp" />
 
             <TextView
                 android:id="@+id/dataLoss"
@@ -266,7 +280,7 @@
             app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/graphViewEcg" />
+            app:layout_constraintTop_toBottomOf="@+id/ecgGraph" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView

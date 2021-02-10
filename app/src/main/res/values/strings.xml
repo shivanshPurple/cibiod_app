@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CIBIOD</string>
+    <string name="app_name">CIBIOD2</string>
 
     <string-array name="Gender">
         <item>GENDER</item>
@@ -9,10 +9,57 @@
 
     <string name="openNavDrawer">Open Navigation Drawer</string>
     <string name="closeNavDrawer">Close Navigation Drawer</string>
-    <string name="title_activity_settings">SettingsActivity</string>
 
     <string name="publisherName"><u>CIBioD</u></string>
     <string name="devName"><u>Purple</u></string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="changeDevicePrompt"><u>Change Paired Device </u></string>
+    <string name="uploadButtonDesc">Upload or finish</string>
+    <string name="heartRateText">HEART\nRATE</string>
+    <string name="batteryText">BATTERY\nLEVEL</string>
+    <string name="temperatureText">BODY\nTEMPERATURE</string>
+    <string name="dataLossText">DATA\nLOSS</string>
+    <string name="addButton">ADD!</string>
+    <string name="nameField">NAME</string>
+    <string name="ageField">AGE</string>
+    <string name="photoButton">Photo</string>
+    <string name="welcomeText">Hi! Doctor</string>
+    <string name="recentText">Recent Patients</string>
+    <string name="newPatientButtonDesc">Add A New Patient</string>
+    <string name="wirelessTechnologyText">WIRELESS \nTECHNOLOGY</string>
+    <string name="wirelessTechnologyDescText">Use our device to reduce the hassle of wires or getting in contact with someone. Your phone will connect automatically to the device while you are examining someone. No need to worry about pairing and connecting to the device.</string>
+    <string name="cloudStorageText">CLOUD \nSTORAGE</string>
+    <string name="cloudStorageDescText">Every test you take will automatically save itself on our cloud services , so you can manage them for later. These tests may also be used to train algorithms which can help you get more out of every analysis.</string>
+    <string name="inAppProcessingText">IN APP \nPROCESSING</string>
+    <string name="inAppProcessingDescText">Our app provides in-app processing features like filtering to pick up heart or lung sounds individually. It can also export every PCG file as a WAV file for sharing purposes.</string>
+    <string name="startButton">START</string>
+    <string name="loginButton">LOGIN</string>
+    <string name="registerButton">| Register |</string>
+    <string name="emailField">E MAIL</string>
+    <string name="passwordField">PASSWORD</string>
+    <string name="logoDesc">Cibiod\'s logo</string>
+    <string name="swipeUpText">SWIPE UP</string>
+    <string name="patientPhotoDesc">Patient\'s Photo</string>
+    <string name="recentTestText">Recent Tests</string>
+    <string name="newTestButtonDesc">New Test</string>
+    <string name="confirmPasswordField">CONFIRM PASSWORD</string>
+    <string name="registerButton2">REGISTER</string>
+    <string name="saveSettingsButtonDesc">Save settings</string>
+    <string name="volumeText">Volume</string>
+    <string name="appInfoText">App Info</string>
+    <string name="versionText">Version</string>
+    <string name="publisherText">Publisher</string>
+    <string name="developerText">Developer</string>
+    <string name="versionCodeText">V1</string>
+    <string name="publisherButtonDesc">Open Publisher Website</string>
+    <string name="devContactButtonDesc">Developer Contact</string>
+    <string name="changePairedDeviceButtonDesc">Change Paired Device</string>
+    <string name="logoutButtonDesc">Logout</string>
+    <string name="navViewAppNameText">E-Stethoscope</string>
+    <string name="menuShareText">Share Test</string>
+    <string name="shareButton">Share</string>
+    <string name="uploadingText">Uploading</string>
+    <string name="menuHomeText">Home</string>
+    <string name="menuQuickTestText">Quick Test</string>
+    <string name="menuSettingsText">Settings</string>
+    <string name="searchPatientsButtonTitle">Search Patients</string>
 </resources>

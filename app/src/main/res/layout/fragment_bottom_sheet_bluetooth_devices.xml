@@ -1,35 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="top"
     android:orientation="vertical"
-    android:id="@+id/bottomSheet"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-    app:behavior_hideable="true">
+    app:behavior_hideable="true"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="32dp"
-        android:paddingBottom="16dp"
         android:paddingStart="16dp"
+        android:paddingTop="32dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
         android:text="Select the device:"
-        android:textAlignment="viewStart" />
+        android:textAlignment="viewStart"
+        tools:ignore="HardcodedText" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/deviceRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/deviceRecyclerView"/>
+        android:layout_height="wrap_content" />
 
     <com.rey.material.widget.ProgressView
         android:id="@+id/deviceSearchProgress"
         android:layout_width="match_parent"
         android:layout_height="16dp"
+        app:pv_autostart="false"
         app:pv_circular="false"
-        app:pv_progressStyle="@style/CustomLinearProgressBar"
         app:pv_progressMode="indeterminate"
-        app:pv_autostart="false"/>
+        app:pv_progressStyle="@style/CustomLinearProgressBar" />
 
 </LinearLayout>

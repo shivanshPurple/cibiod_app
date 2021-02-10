@@ -3,15 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/exportButton"
         android:icon="@drawable/icon_share"
-        app:showAsAction="always"
-        android:title="Share">
+        android:title="@string/shareButton"
+        app:showAsAction="always">
 
         <menu>
-            <item android:id="@+id/export"
-                android:title="         Share Test">
-            </item>
+            <item
+                android:id="@+id/export"
+                android:title="@string/menuShareText" />
         </menu>
 
     </item>

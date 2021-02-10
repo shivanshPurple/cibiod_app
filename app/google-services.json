@@ -34,6 +34,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:294579581014:android:d4aeb6d5ba31215dfb0bf7",
+        "android_client_info": {
+          "package_name": "com.cibiod2.estetho"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "294579581014-voe0sbb7qqo214u99is1itsjeb2fvm5m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATVm4RIvhHklSCSXzkiKEUm-W-RgGnUtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "294579581014-voe0sbb7qqo214u99is1itsjeb2fvm5m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

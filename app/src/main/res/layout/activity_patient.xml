@@ -10,11 +10,10 @@
     android:transitionName="patientContainer">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/homeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/blue"
-        tools:context=".Activities.HomeActivity">
+        tools:context=".activities.HomeActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -23,7 +22,6 @@
             android:stateListAnimator="@null">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
-                android:id="@+id/collapsingToolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:contentScrim="@color/blue"
@@ -36,6 +34,7 @@
                     android:layout_height="128dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="118dp"
+                    android:contentDescription="@string/patientPhotoDesc"
                     android:transitionName="patientSharedImg"
                     app:layout_collapseMode="parallax"
                     app:srcCompat="@drawable/vector_patient_male" />
@@ -49,7 +48,8 @@
                     android:text="Name"
                     android:textColor="@color/white"
                     android:textSize="18sp"
-                    app:layout_collapseMode="parallax" />
+                    app:layout_collapseMode="parallax"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/patientId"
@@ -60,7 +60,8 @@
                     android:text="#123"
                     android:textColor="@color/white"
                     android:textSize="12sp"
-                    app:layout_collapseMode="parallax" />
+                    app:layout_collapseMode="parallax"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/patientGender"
@@ -69,10 +70,11 @@
                     android:layout_gravity="end"
                     android:layout_marginTop="285dp"
                     android:layout_marginEnd="32dp"
-                    android:text="MALE"
+                    android:text="Male"
                     android:textColor="@color/white"
                     android:textSize="18sp"
-                    app:layout_collapseMode="parallax" />
+                    app:layout_collapseMode="parallax"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/patientAge"
@@ -81,10 +83,11 @@
                     android:layout_gravity="end"
                     android:layout_marginTop="310dp"
                     android:layout_marginEnd="32dp"
-                    android:text="21"
+                    android:text="18"
                     android:textColor="@color/white"
                     android:textSize="12sp"
-                    app:layout_collapseMode="parallax" />
+                    app:layout_collapseMode="parallax"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -92,7 +95,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="365dp"
                     android:layout_marginBottom="8dp"
-                    android:text="Recent Tests"
+                    android:text="@string/recentTestText"
                     android:textColor="@color/white"
                     android:textSize="15sp"
                     app:layout_collapseMode="parallax" />
@@ -118,10 +121,10 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabPatient"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/fab_shape"
+            android:contentDescription="@string/newTestButtonDesc"
             android:onClick="startNewTest"
             android:rotation="45"
             android:src="@drawable/icon_plus_45"
@@ -140,8 +143,8 @@
             app:hideOnScroll="true" />
 
         <ViewStub
-            android:layout_width="wrap_content"
             android:id="@+id/viewStubPatient"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|bottom"
             android:layout_marginBottom="125dp" />

@@ -4,8 +4,8 @@
     android:id="@+id/loadingShower"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:elevation="10dp"
-    android:alpha="0">
+    android:alpha="0"
+    android:elevation="10dp">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/loadingView"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
-        android:text="Uploading"
+        android:text="@string/uploadingText"
         android:textColor="@color/white"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"

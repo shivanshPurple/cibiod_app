@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".Activities.LogoActivity">
+    tools:context=".activities.LogoActivity">
 
     <TextView
         android:id="@+id/swipeUpText"
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:fontFamily="sans-serif-thin"
-        android:text="SWIPE UP"
+        android:text="@string/swipeUpText"
         android:textColor="@color/grey"
         android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
-        android:contentDescription="Cibiod's logo"
+        android:contentDescription="@string/logoDesc"
         app:layout_constraintBottom_toTopOf="@+id/swipeUpText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,6 +36,7 @@
         android:id="@+id/orangeBg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
         android:scaleType="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

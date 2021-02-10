@@ -2,7 +2,7 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Search Patients"
+    <item android:title="@string/searchPatientsButtonTitle"
         android:id="@+id/searchView"
         android:icon="@drawable/icon_patient_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"

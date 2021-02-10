@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent">
+    android:background="@color/transparent"
+    tools:ignore="Overdraw">
 
     <include layout="@layout/fragment_upload_shower" />
 
@@ -14,6 +15,7 @@
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="48dp"
         android:background="@drawable/fab_shape"
+        android:importantForAccessibility="no"
         android:scaleX="30"
         android:scaleY="30"
         android:transitionName="containerTransform"
@@ -25,9 +27,10 @@
         android:id="@+id/patientPhoto"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:elevation="2dp"
         android:layout_gravity="center"
         android:layout_margin="48dp"
+        android:elevation="2dp"
+        android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,13 +45,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".Activities.LoginActivity">
+        tools:context=".activities.LoginActivity">
 
         <Button
             android:id="@+id/addButton"
             style="@style/ButtonTheme"
             android:layout_marginBottom="88dp"
-            android:text="ADD!"
+            android:text="@string/addButton"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -59,6 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="50dp"
+            android:importantForAccessibility="no"
             android:scaleX="1.5"
             android:scaleY="1.5"
             android:src="@drawable/icon_plus"
@@ -84,6 +88,7 @@
                 android:layout_height="29.5dp"
                 android:layout_alignTop="@+id/addNameEdit"
                 android:layout_alignParentStart="true"
+                android:importantForAccessibility="no"
                 android:scaleX="0"
                 app:srcCompat="@drawable/bg_edittext_onselect" />
 
@@ -94,7 +99,7 @@
                 android:background="@drawable/bg_edittext"
                 android:backgroundTint="@color/white"
                 android:gravity="center"
-                android:hint="NAME"
+                android:hint="@string/nameField"
                 android:inputType="textPersonName" />
 
         </RelativeLayout>
@@ -116,6 +121,7 @@
                 android:layout_height="29.5dp"
                 android:layout_alignTop="@+id/addAgeEdit"
                 android:layout_alignParentStart="true"
+                android:importantForAccessibility="no"
                 android:scaleX="0"
                 app:srcCompat="@drawable/bg_edittext_onselect" />
 
@@ -126,7 +132,7 @@
                 android:background="@drawable/bg_edittext"
                 android:backgroundTint="@color/white"
                 android:gravity="center"
-                android:hint="AGE"
+                android:hint="@string/ageField"
                 android:inputType="number" />
 
         </RelativeLayout>
@@ -146,8 +152,9 @@
                 android:id="@+id/addGenderPopupBg"
                 android:layout_width="match_parent"
                 android:layout_height="105dp"
-                android:layout_alignTop="@+id/genderSpinner"
+                android:layout_alignTop="@+id/addGenderSpinner"
                 android:layout_alignParentStart="true"
+                android:importantForAccessibility="no"
                 android:paddingBottom="0dp"
                 android:translationY="-105dp"
                 app:srcCompat="@drawable/bg_dropdown" />
@@ -160,11 +167,12 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="11dp"
                 android:layout_marginEnd="11dp"
+                android:importantForAccessibility="no"
                 android:scaleX="3"
                 android:scaleY="3"
                 app:srcCompat="@drawable/icon_dropdown" />
 
-            <com.cibiod.app.CustomViews.CustomSpinner
+            <com.cibiod2.estetho.customViews.CustomSpinner
                 android:id="@+id/addGenderSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -183,7 +191,7 @@
             android:layout_marginTop="64dp"
             android:drawableBottom="@drawable/icon_cam"
             android:padding="12dp"
-            android:text="Photo"
+            android:text="@string/photoButton"
             android:textColor="@color/white"
             app:layout_constraintBottom_toTopOf="@id/addButton"
             app:layout_constraintEnd_toEndOf="parent"

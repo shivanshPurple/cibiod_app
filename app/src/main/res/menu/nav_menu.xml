@@ -4,21 +4,21 @@
     <item
         android:id="@+id/menuHome"
         android:icon="@drawable/icon_home"
-        android:title="Home" />
+        android:title="@string/menuHomeText" />
 
     <item
         android:id="@+id/menuQuickTest"
         android:icon="@drawable/icon_quick_test"
-        android:title="Quick Test" />
+        android:title="@string/menuQuickTestText" />
 
     <item
         android:id="@+id/menuSettings"
         android:icon="@drawable/icon_setting"
-        android:title="Settings" />
+        android:title="@string/menuSettingsText" />
 
     <item
         android:id="@+id/logoutSettings"
         android:icon="@drawable/icon_logout"
-        android:title="Logout" />
+        android:title="@string/logoutButtonDesc" />
 
 </menu>
